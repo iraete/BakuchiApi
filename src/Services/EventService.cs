@@ -29,9 +29,9 @@ namespace BakuchiApi.Services
             return await _context.Events.FindAsync(id);
         }
 
-        public async Task PutEvent(Event eventDto)
+        public async Task PutEvent(Event eventObj)
         {
-            _context.Entry(eventDto).State = EntityState.Modified;
+            _context.Entry(eventObj).State = EntityState.Modified;
 
             try
             {
@@ -39,7 +39,7 @@ namespace BakuchiApi.Services
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!EventExists(eventDto.Id))
+                if (!EventExists(eventObj.Id))
                 {
                     throw new status.NotFoundException();
                 }
@@ -51,16 +51,16 @@ namespace BakuchiApi.Services
 
         }
 
-        public async Task PostEvent(Event eventDto)
+        public async Task PostEvent(Event eventObj)
         {
-            _context.Events.Add(eventDto);
+            _context.Events.Add(eventObj);
             try
             {
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateException)
             {
-                if (EventExists(eventDto.Id))
+                if (EventExists(eventObj.Id))
                 {
                     throw new status.ConflictException();
                 }
@@ -71,9 +71,9 @@ namespace BakuchiApi.Services
             }
         }
 
-        public async Task DeleteEvent(Event eventDto)
+        public async Task DeleteEvent(Event eventObj)
         {
-            _context.Events.Remove(eventDto);
+            _context.Events.Remove(eventObj);
             await _context.SaveChangesAsync();
         }
 

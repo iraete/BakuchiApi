@@ -30,9 +30,9 @@ namespace BakuchiApi.Services
             return await _context.Outcomes.FindAsync(eventId, outcomeId);
         }
 
-        public async Task PutOutcome(Outcome outcomeDto)
+        public async Task PutOutcome(Outcome outcome)
         {
-            _context.Entry(outcomeDto).State = EntityState.Modified;
+            _context.Entry(outcome).State = EntityState.Modified;
 
             try
             {
@@ -40,7 +40,7 @@ namespace BakuchiApi.Services
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!OutcomeExists(outcomeDto.EventId, outcomeDto.Id))
+                if (!OutcomeExists(outcome.EventId, outcome.Id))
                 {
                     throw new status.NotFoundException();
                 }
@@ -51,15 +51,15 @@ namespace BakuchiApi.Services
             }
         }
 
-        public async Task PostOutcome(Outcome outcomeDto)
+        public async Task PostOutcome(Outcome outcome)
         {
-            _context.Outcomes.Add(outcomeDto);
+            _context.Outcomes.Add(outcome);
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteOutcome(Outcome outcomeDto)
+        public async Task DeleteOutcome(Outcome outcome)
         {
-            _context.Outcomes.Remove(outcomeDto);
+            _context.Outcomes.Remove(outcome);
             await _context.SaveChangesAsync();
         }
 

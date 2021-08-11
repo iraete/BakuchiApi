@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BakuchiApi.Models;
+using BakuchiApi.Models.Dtos;
 using BakuchiApi.Services.Interfaces;
 using status = BakuchiApi.StatusExceptions;
 

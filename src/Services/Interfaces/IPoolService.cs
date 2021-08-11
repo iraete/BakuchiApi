@@ -11,8 +11,8 @@ namespace BakuchiApi.Services.Interfaces
         Task<List<Pool>> GetPools();
         Task<Pool> GetPool(Guid id);
         Task<List<Pool>> GetPoolsByEvent(Guid eventId);
-        Task PutPool(Pool poolDto);
-        Task PostPool(Pool poolDto);
-        Task DeletePool(Pool poolDto);
+        Task PutPool(Pool pool);
+        Task PostPool(Pool pool);
+        Task DeletePool(Pool pool);
     }
 }

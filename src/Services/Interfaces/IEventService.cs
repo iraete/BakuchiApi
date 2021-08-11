@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using BakuchiApi.Models;
+using BakuchiApi.Models.Dtos;
 
 namespace BakuchiApi.Services.Interfaces
 {
@@ -10,8 +11,8 @@ namespace BakuchiApi.Services.Interfaces
         bool EventExists(Guid eventId);
         Task<List<Event>> GetEvents();
         Task<Event> GetEvent(Guid eventId);
-        Task PutEvent(Event eventDto);
-        Task PostEvent(Event eventDto);
-        Task DeleteEvent(Event eventDto);
+        Task PutEvent(Event eventObj);
+        Task PostEvent(Event eventObj);
+        Task DeleteEvent(Event eventObj);
     }
 }

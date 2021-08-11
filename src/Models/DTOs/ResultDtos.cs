@@ -16,4 +16,18 @@ namespace BakuchiApi.Models.Dtos
         public uint OutcomeId { get; set; }
         public uint Rank { get; set; }
     }
+
+    public class ResultDtoMapper : DtoMapper<Result, ResultDto>
+    {
+        public override ResultDto MapEntityToDto(Result r)
+        {
+            return new ResultDto
+            {
+                EventId = r.EventId,
+                OutcomeId = r.OutcomeId,
+                Rank = r.Rank,
+                LastEdited = r.LastEdited
+            };
+        }
+    }
 }

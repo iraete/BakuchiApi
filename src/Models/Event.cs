@@ -16,7 +16,7 @@ namespace BakuchiApi.Models
         // Server it originated from
         public Guid ServerId { get; set; }
         
-        public string description { get; set; }
+        public string Description { get; set; }
 
         // Determines when betting pools close
         public DateTime Start { get; set; }

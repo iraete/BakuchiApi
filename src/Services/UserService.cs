@@ -28,9 +28,9 @@ namespace BakuchiApi.Services
             return await _context.Users.FindAsync(id);
         }
 
-        public async Task PutUser(User userDto)
+        public async Task PutUser(User user)
         {
-            _context.Entry(userDto).State = EntityState.Modified;
+            _context.Entry(user).State = EntityState.Modified;
 
             try
             {
@@ -38,7 +38,7 @@ namespace BakuchiApi.Services
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!UserExists(userDto.Id))
+                if (!UserExists(user.Id))
                 {
                     throw new status.NotFoundException();
                 }
@@ -50,26 +50,26 @@ namespace BakuchiApi.Services
 
         }
 
-        public async Task PostUser(User userDto)
+        public async Task PostUser(User user)
         {
-            _context.Users.Add(userDto);
+            _context.Users.Add(user);
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteUser(User userDto)
+        public async Task DeleteUser(User user)
         {
-            _context.Users.Remove(userDto);
+            _context.Users.Remove(user);
             await _context.SaveChangesAsync();
         }
 
-        public List<Event> GetEvents(User userDto)
+        public List<Event> GetEvents(User user)
         {
-            return userDto.Events.ToList();
+            return user.Events.ToList();
         }
 
-        public List<Wager> GetWagers(User userDto)
+        public List<Wager> GetWagers(User user)
         {
-            return userDto.Wagers.ToList();
+            return user.Wagers.ToList();
         }
 
         public bool UserExists(Guid id)

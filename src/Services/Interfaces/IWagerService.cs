@@ -10,8 +10,8 @@ namespace BakuchiApi.Services.Interfaces
         bool WagerExists(Guid userId, Guid eventPoolId);
         Task<List<Wager>> GetWagers(Guid userId);
         Task<Wager> GetWager(Guid userId, Guid eventPoolId);
-        Task PutWager(Wager userWagerDto);
-        Task PostWager(Wager userWagerDto);
-        Task DeleteWager(Wager userWagerDto);
+        Task PutWager(Wager userWager);
+        Task PostWager(Wager userWager);
+        Task DeleteWager(Wager userWager);
     }
 }

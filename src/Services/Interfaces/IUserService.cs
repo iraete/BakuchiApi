@@ -10,10 +10,10 @@ namespace BakuchiApi.Services.Interfaces
         bool UserExists(Guid id);
         Task<List<User>> GetUsers();
         Task<User> GetUser(Guid id);
-        Task PutUser(User userDto);
-        Task PostUser(User userDto);
-        Task DeleteUser(User userDto);
-        List<Event> GetEvents(User userDto);
-        List<Wager> GetWagers(User userDto);
+        Task PutUser(User user);
+        Task PostUser(User user);
+        Task DeleteUser(User user);
+        List<Event> GetEvents(User user);
+        List<Wager> GetWagers(User user);
     }
 }

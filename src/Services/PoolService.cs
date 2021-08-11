@@ -35,9 +35,9 @@ namespace BakuchiApi.Services
                 p => p.EventId == eventId).ToListAsync();
         }
 
-        public async Task PutPool(Pool poolDto)
+        public async Task PutPool(Pool pool)
         {
-            _context.Entry(poolDto).State = EntityState.Modified;
+            _context.Entry(pool).State = EntityState.Modified;
 
             try
             {
@@ -45,7 +45,7 @@ namespace BakuchiApi.Services
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!PoolExists(poolDto.Id))
+                if (!PoolExists(pool.Id))
                 {
                     throw new status.NotFoundException();
                 }
@@ -56,15 +56,15 @@ namespace BakuchiApi.Services
             }
         }
 
-        public async Task PostPool(Pool poolDto)
+        public async Task PostPool(Pool pool)
         {
-            _context.Pools.Add(poolDto);
+            _context.Pools.Add(pool);
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeletePool(Pool poolDto)
+        public async Task DeletePool(Pool pool)
         {
-            _context.Pools.Remove(poolDto);
+            _context.Pools.Remove(pool);
             await _context.SaveChangesAsync();
         }
 

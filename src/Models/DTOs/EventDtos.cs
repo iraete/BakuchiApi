@@ -8,7 +8,7 @@ namespace BakuchiApi.Models.Dtos
         public string Alias { get; set; }
         public Guid UserId { get; set; }
         public Guid ServerId { get; set; }
-        public string description { get; set; }
+        public string Description { get; set; }
         public DateTime Start { get; set; }
         public DateTime End { get; set; }
         public DateTime Created { get; set; }
@@ -20,8 +20,27 @@ namespace BakuchiApi.Models.Dtos
         public string Alias { get; set; }
         public Guid UserId { get; set; }
         public Guid ServerId { get; set; }
-        public string description { get; set; }
+        public string Description { get; set; }
         public DateTime Start { get; set; }
         public DateTime End { get; set; }
+    }
+
+    public class EventDtoMapper : DtoMapper<Event, EventDto>
+    {
+        public override EventDto MapEntityToDto(Event e)
+        {
+            return new EventDto
+            {
+                Id = e.Id,
+                Name = e.Name,
+                Alias = e.Alias,
+                UserId = e.UserId,
+                ServerId = e.ServerId,
+                Description = e.Description,
+                Start = e.Start,
+                End = e.End,
+                Created = e.Created
+            };
+        }
     }
 }

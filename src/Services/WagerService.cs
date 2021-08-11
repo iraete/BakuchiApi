@@ -36,9 +36,9 @@ namespace BakuchiApi.Services
             return await _context.Wagers.FindAsync(userId, eventPoolId);
         }
 
-        public async Task PutWager(Wager userWagerDto)
+        public async Task PutWager(Wager userWager)
         {
-            _context.Entry(userWagerDto).State = EntityState.Modified;
+            _context.Entry(userWager).State = EntityState.Modified;
 
             try
             {
@@ -46,7 +46,7 @@ namespace BakuchiApi.Services
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!WagerExists(userWagerDto.UserId, userWagerDto.PoolId))
+                if (!WagerExists(userWager.UserId, userWager.PoolId))
                 {
                     throw new status.NotFoundException();
                 }
@@ -57,9 +57,9 @@ namespace BakuchiApi.Services
             }
         }
 
-        public async Task PostWager(Wager userWagerDto)
+        public async Task PostWager(Wager userWager)
         {
-            _context.Wagers.Add(userWagerDto);
+            _context.Wagers.Add(userWager);
 
             try
             {
@@ -67,7 +67,7 @@ namespace BakuchiApi.Services
             }
             catch (DbUpdateException)
             {
-                if (WagerExists(userWagerDto.UserId, userWagerDto.PoolId))
+                if (WagerExists(userWager.UserId, userWager.PoolId))
                 {
                     throw new status.ConflictException();
                 }
@@ -78,9 +78,9 @@ namespace BakuchiApi.Services
             }
         }
 
-        public async Task DeleteWager(Wager userWagerDto)
+        public async Task DeleteWager(Wager userWager)
         {
-            _context.Wagers.Remove(userWagerDto);
+            _context.Wagers.Remove(userWager);
             await _context.SaveChangesAsync();
         }
     }

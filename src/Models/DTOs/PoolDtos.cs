@@ -19,4 +19,20 @@ namespace BakuchiApi.Models.Dtos
         public double PoolNum { get; set; }
         public string Description { get; set; }
     }
+
+    public class PoolDtoMapper : DtoMapper<Pool, PoolDto>
+    {
+        public override PoolDto MapEntityToDto(Pool p)
+        {
+            return new PoolDto
+            {
+                Id = p.Id,
+                EventId = p.EventId,
+                BetType = p.BetType,
+                PoolNum = p.PoolNum,
+                TotalWagers = p.TotalWagers,
+                Description = p.Description
+            };
+        }
+    }
 }
