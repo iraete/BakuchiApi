@@ -8,10 +8,10 @@ namespace BakuchiApi.Services.Interfaces
     public interface IWagerService
     {
         bool WagerExists(Guid userId, Guid eventPoolId);
-        Task<List<Wager>> GetWagers(Guid userId);
-        Task<Wager> GetWager(Guid userId, Guid eventPoolId);
-        Task PutWager(Wager userWager);
-        Task PostWager(Wager userWager);
+        Task<List<Wager>> RetrieveWagers(Guid userId);
+        Task<Wager> RetrieveWager(Guid userId, Guid eventPoolId);
+        Task UpdateWager(Wager userWager);
+        Task CreateWager(Wager userWager);
         Task DeleteWager(Wager userWager);
     }
 }

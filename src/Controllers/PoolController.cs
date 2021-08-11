@@ -21,16 +21,16 @@ namespace BakuchiApi.Controllers
 
         // GET: api/Pool
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Pool>>> GetPools()
+        public async Task<ActionResult<IEnumerable<Pool>>> RetrievePools()
         {
-            return await _service.GetPools();
+            return await _service.RetrievePools();
         }
 
         // GET: api/Pool/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Pool>> GetPool(Guid id)
+        public async Task<ActionResult<Pool>> RetrievePool(Guid id)
         {
-            var pool = await _service.GetPool(id);
+            var pool = await _service.RetrievePool(id);
 
             if (pool == null)
             {
@@ -42,15 +42,15 @@ namespace BakuchiApi.Controllers
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Pool>>>
-            GetPoolsByEvent(Guid eventId)
+            RetrievePoolsByEvent(Guid eventId)
         {
-            return await _service.GetPoolsByEvent(eventId);
+            return await _service.RetrievePoolsByEvent(eventId);
         }
 
         // PUT: api/Pool/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutPool(Guid id,
+        public async Task<IActionResult> UpdatePool(Guid id,
             Pool poolDto)
         {
             if (id != poolDto.Id)
@@ -60,7 +60,7 @@ namespace BakuchiApi.Controllers
 
             try
             {
-                await _service.PutPool(poolDto);
+                await _service.UpdatePool(poolDto);
             }
             catch (status.NotFoundException)
             {
@@ -77,7 +77,7 @@ namespace BakuchiApi.Controllers
         // POST: api/Pool
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Pool>> PostPool(
+        public async Task<ActionResult<Pool>> CreatePool(
             Guid eventId, Pool poolDto)
         {
             if (eventId != poolDto.EventId)
@@ -85,8 +85,8 @@ namespace BakuchiApi.Controllers
                 return BadRequest();
             }
 
-            await _service.PostPool(poolDto);
-            return CreatedAtAction("GetPool", new { id = poolDto.Id },
+            await _service.CreatePool(poolDto);
+            return CreatedAtAction("RetrievePool", new { id = poolDto.Id },
                 poolDto);
         }
 
@@ -94,7 +94,7 @@ namespace BakuchiApi.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePool(Guid id)
         {
-            var pool = await _service.GetPool(id);
+            var pool = await _service.RetrievePool(id);
 
             if (pool == null)
             {

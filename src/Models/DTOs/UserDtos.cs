@@ -10,11 +10,18 @@ namespace BakuchiApi.Models.Dtos
         public DateTime LastRewardTime { get; set; }
     }
 
-    public class CreateUserDto
+    public class UpdateUserDto : BaseIdDto
     {
         public string Name { get; set; }
         public long DiscordId { get; set; }
     }
+
+    public class InputUserDto
+    {
+        public string Name { get; set; }
+        public long DiscordId { get; set; }
+    }
+
 
     public class UserDtoMapper : DtoMapper<User, UserDto>
     {
@@ -27,6 +34,37 @@ namespace BakuchiApi.Models.Dtos
                 Name = u.Name,
                 Balance = (int) u.Balance,
                 LastRewardTime = u.LastRewardTime
+            };
+        }
+
+        public override User MapDtoToEntity(UserDto dto)
+        {
+            return new User
+            {
+                Id = dto.Id,
+                DiscordId = dto.DiscordId,
+                Balance = (double) dto.Balance,
+                Name = dto.Name,
+                LastRewardTime = dto.LastRewardTime
+            };
+        }
+
+        public User MapInputDtoToEntity(InputUserDto dto)
+        {
+            return new User
+            {
+                Name = dto.Name,
+                DiscordId = dto.DiscordId
+            };
+        }
+
+        public User MapUpdateDtoToEntity(UpdateUserDto dto)
+        {
+            return new User
+            {
+                Id = dto.Id,
+                Name = dto.Name,
+                DiscordId = dto.DiscordId
             };
         }
     }

@@ -9,10 +9,10 @@ namespace BakuchiApi.Services.Interfaces
     public interface IEventService
     {
         bool EventExists(Guid eventId);
-        Task<List<Event>> GetEvents();
-        Task<Event> GetEvent(Guid eventId);
-        Task PutEvent(Event eventObj);
-        Task PostEvent(Event eventObj);
+        Task<List<Event>> RetrieveEvents();
+        Task<Event> RetrieveEvent(Guid eventId);
+        Task UpdateEvent(Event eventObj);
+        Task CreateEvent(Event eventObj);
         Task DeleteEvent(Event eventObj);
     }
 }

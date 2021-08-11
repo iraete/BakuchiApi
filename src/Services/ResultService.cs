@@ -18,18 +18,18 @@ namespace BakuchiApi.Services
             _context = context;
         }
 
-        public async Task<Result> GetResult(Guid eventId, uint outcomeId)
+        public async Task<Result> RetrieveResult(Guid eventId, uint outcomeId)
         {
             return await _context.Results.FindAsync(eventId, outcomeId);
         }
 
-        public async Task<List<Result>> GetResultsByEvent(Guid eventId)
+        public async Task<List<Result>> RetrieveResultsByEvent(Guid eventId)
         {
             return await _context.Results.Where(
                 r => r.EventId == eventId).ToListAsync();
         }
 
-        public async Task PutResult(Result result)
+        public async Task UpdateResult(Result result)
         {
             _context.Entry(result).State = EntityState.Modified;
 
@@ -50,7 +50,7 @@ namespace BakuchiApi.Services
             }
         }
 
-        public async Task PostResult(Result result)
+        public async Task CreateResult(Result result)
         {
             _context.Results.Add(result);
             await _context.SaveChangesAsync();

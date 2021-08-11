@@ -39,5 +39,10 @@ namespace BakuchiApi.Models.Dtos
                 BetType = w.BetType
             };
         }
+
+        public override Wager MapDtoToEntity(WagerDto dto)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -19,17 +19,17 @@ namespace BakuchiApi.Services
             _context = context;
         }
 
-        public async Task<List<Event>> GetEvents()
+        public async Task<List<Event>> RetrieveEvents()
         {
             return await _context.Events.ToListAsync();
         }
 
-        public async Task<Event> GetEvent(Guid id)
+        public async Task<Event> RetrieveEvent(Guid id)
         {
             return await _context.Events.FindAsync(id);
         }
 
-        public async Task PutEvent(Event eventObj)
+        public async Task UpdateEvent(Event eventObj)
         {
             _context.Entry(eventObj).State = EntityState.Modified;
 
@@ -51,8 +51,10 @@ namespace BakuchiApi.Services
 
         }
 
-        public async Task PostEvent(Event eventObj)
+        public async Task CreateEvent(Event eventObj)
         {
+            eventObj.Id = Guid.NewGuid();
+            eventObj.Created = DateTime.Now;
             _context.Events.Add(eventObj);
             try
             {

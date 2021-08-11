@@ -28,15 +28,15 @@ namespace BakuchiApi.Controllers
         // GET: api/Result
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Result>>>
-            GetResultsByEvent(Guid eventId)
+            RetrieveResultsByEvent(Guid eventId)
         {
-            return await _resultService.GetResultsByEvent(eventId);
+            return await _resultService.RetrieveResultsByEvent(eventId);
         }
 
         // PUT: api/Result/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut]
-        public async Task<IActionResult> PutResults(Guid eventId, Result[] resultDtos)
+        public async Task<IActionResult> UpdateResults(Guid eventId, Result[] resultDtos)
         {
             var tasks = new List<Task>();
 
@@ -48,7 +48,7 @@ namespace BakuchiApi.Controllers
                 }
             }
 
-            await ProcessResults(resultDtos, _resultService.PutResult);
+            await ProcessResults(resultDtos, _resultService.UpdateResult);
 
             return NoContent();
         }
@@ -56,7 +56,7 @@ namespace BakuchiApi.Controllers
         // POST: api/Result
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Result>> PostResults(Guid eventId, Result[] resultDtos)
+        public async Task<ActionResult<Result>> CreateResults(Guid eventId, Result[] resultDtos)
         {
             foreach (var r in resultDtos)
             {
@@ -66,9 +66,9 @@ namespace BakuchiApi.Controllers
                 }
             }
 
-            await ProcessResults(resultDtos, _resultService.PostResult);
+            await ProcessResults(resultDtos, _resultService.CreateResult);
 
-            return CreatedAtAction("GetResultByEvent", new { eventId = eventId }, eventId);
+            return CreatedAtAction("RetrieveResultByEvent", new { eventId = eventId }, eventId);
         }
 
         // DELETE: api/Result/5
@@ -82,7 +82,7 @@ namespace BakuchiApi.Controllers
                 return NotFound();
             }
 
-            var results = await _resultService.GetResultsByEvent(eventId);
+            var results = await _resultService.RetrieveResultsByEvent(eventId);
             await ProcessResults(results, _resultService.DeleteResult);
 
             return NoContent();

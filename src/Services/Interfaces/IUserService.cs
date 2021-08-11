@@ -8,12 +8,13 @@ namespace BakuchiApi.Services.Interfaces
     public interface IUserService
     {
         bool UserExists(Guid id);
-        Task<List<User>> GetUsers();
-        Task<User> GetUser(Guid id);
-        Task PutUser(User user);
-        Task PostUser(User user);
+        Task<List<User>> RetrieveUsers();
+        Task<User> RetrieveUser(Guid id);
+        Task<User> RetrieveUserByDiscordId(long discordId);
+        Task UpdateUser(User user);
+        Task CreateUser(User user);
         Task DeleteUser(User user);
-        List<Event> GetEvents(User user);
-        List<Wager> GetWagers(User user);
+        List<Event> RetrieveEvents(User user);
+        List<Wager> RetrieveWagers(User user);
     }
 }

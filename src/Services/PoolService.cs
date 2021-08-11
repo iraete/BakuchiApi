@@ -19,23 +19,23 @@ namespace BakuchiApi.Services
             _context = context;
         }
 
-        public async Task<List<Pool>> GetPools()
+        public async Task<List<Pool>> RetrievePools()
         {
             return await _context.Pools.ToListAsync();
         }
 
-        public async Task<Pool> GetPool(Guid id)
+        public async Task<Pool> RetrievePool(Guid id)
         {
             return await _context.Pools.FindAsync(id);
         }
 
-        public async Task<List<Pool>> GetPoolsByEvent(Guid eventId)
+        public async Task<List<Pool>> RetrievePoolsByEvent(Guid eventId)
         {
             return await _context.Pools.Where(
                 p => p.EventId == eventId).ToListAsync();
         }
 
-        public async Task PutPool(Pool pool)
+        public async Task UpdatePool(Pool pool)
         {
             _context.Entry(pool).State = EntityState.Modified;
 
@@ -56,7 +56,7 @@ namespace BakuchiApi.Services
             }
         }
 
-        public async Task PostPool(Pool pool)
+        public async Task CreatePool(Pool pool)
         {
             _context.Pools.Add(pool);
             await _context.SaveChangesAsync();

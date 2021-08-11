@@ -18,17 +18,23 @@ namespace BakuchiApi.Services
             _context = context;
         }
 
-        public async Task<List<User>> GetUsers()
+        public async Task<List<User>> RetrieveUsers()
         {
             return await _context.Users.ToListAsync();
         }
 
-        public async Task<User> GetUser(Guid id)
+        public async Task<User> RetrieveUser(Guid id)
         {
             return await _context.Users.FindAsync(id);
         }
 
-        public async Task PutUser(User user)
+        public async Task<User> RetrieveUserByDiscordId(long discordId)
+        {
+            return await _context.Users.FirstOrDefaultAsync(
+                u => u.DiscordId == discordId);
+        }
+
+        public async Task UpdateUser(User user)
         {
             _context.Entry(user).State = EntityState.Modified;
 
@@ -50,8 +56,9 @@ namespace BakuchiApi.Services
 
         }
 
-        public async Task PostUser(User user)
+        public async Task CreateUser(User user)
         {
+            user.Id = Guid.NewGuid();
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
         }
@@ -62,12 +69,12 @@ namespace BakuchiApi.Services
             await _context.SaveChangesAsync();
         }
 
-        public List<Event> GetEvents(User user)
+        public List<Event> RetrieveEvents(User user)
         {
             return user.Events.ToList();
         }
 
-        public List<Wager> GetWagers(User user)
+        public List<Wager> RetrieveWagers(User user)
         {
             return user.Wagers.ToList();
         }

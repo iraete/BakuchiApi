@@ -34,5 +34,10 @@ namespace BakuchiApi.Models.Dtos
                 Description = p.Description
             };
         }
+
+        public override Pool MapDtoToEntity(PoolDto dto)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

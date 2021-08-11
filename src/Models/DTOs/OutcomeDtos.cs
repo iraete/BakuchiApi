@@ -31,5 +31,10 @@ namespace BakuchiApi.Models.Dtos
                 Created = outcome.Created
             };
         }
+
+        public override Outcome MapDtoToEntity(OutcomeDto dto)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

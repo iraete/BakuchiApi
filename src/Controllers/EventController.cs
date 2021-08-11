@@ -23,33 +23,38 @@ namespace BakuchiApi.Controllers
 
         // GET: api/Event
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Event>>> GetEvents()
+        public async Task<ActionResult<IEnumerable<EventDto>>> RetrieveEvents()
         {
-            return await _service.GetEvents();
+            var mapper = new EventDtoMapper();
+            var events = await _service.RetrieveEvents();
+            return mapper.MapEntitiesToDtos(events);
         }
 
         // GET: api/Event/?alias=bakuchi&userid=2000&serverid=1000
         [HttpGet]
-        public async Task<ActionResult<Event>> GetEvent(Guid eventId)
+        public async Task<ActionResult<EventDto>> RetrieveEvent(Guid eventId)
         {
-            var @event = await _service.GetEvent(eventId);
+            var mapper = new EventDtoMapper();
+            var @event = await _service.RetrieveEvent(eventId);
 
             if (@event == null)
             {
                 return NotFound();
             }
 
-            return @event;
+            return mapper.MapEntityToDto(@event);
         }
 
         // PUT: api/Event
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut]
-        public async Task<IActionResult> PutEvent(Event @event)
+        public async Task<IActionResult> UpdateEvent(EventDto dto)
         {
+            var mapper = new EventDtoMapper();
+            var @event = mapper.MapDtoToEntity(dto);
             try
             {
-                await _service.PutEvent(@event);
+                await _service.UpdateEvent(@event);
             }
             catch (status.NotFoundException)
             {
@@ -66,11 +71,22 @@ namespace BakuchiApi.Controllers
         // POST: api/Event
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Event>> PostEvent(Event @event)
+        public async Task<ActionResult<EventDto>> CreateEvent(CreateEventDto eventDto)
         {
+            var @event = new Event
+            {
+                Name = eventDto.Name,
+                Alias = eventDto.Alias,
+                UserId = eventDto.UserId,
+                ServerId = eventDto.ServerId,
+                Description = eventDto.Description,
+                Start = eventDto.Start,
+                End = eventDto.End
+            };
+            
             try
             {
-                await _service.PostEvent(@event);
+                await _service.CreateEvent(@event);
             }
             catch (status.ConflictException)
             {
@@ -81,14 +97,14 @@ namespace BakuchiApi.Controllers
                 throw new Exception("Error adding event.");
             }
 
-            return CreatedAtAction("GetEvent", new { id = @event.Id }, @event);
+            return CreatedAtAction("RetrieveEvent", new { id = @event.Id }, @event);
         }
 
         // DELETE: api/Event/?alias=bakuchi&userid=2000&serverid=1000
         [HttpDelete]
         public async Task<IActionResult> DeleteEvent(Guid eventId)
         {
-            var @event = await _service.GetEvent(eventId);
+            var @event = await _service.RetrieveEvent(eventId);
 
             if (@event == null)
             {

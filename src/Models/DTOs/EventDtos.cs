@@ -42,5 +42,22 @@ namespace BakuchiApi.Models.Dtos
                 Created = e.Created
             };
         }
+
+        public override Event MapDtoToEntity(EventDto e)
+        {
+            return new Event
+            {
+                Id = e.Id,
+                Name = e.Name,
+                Alias = e.Alias,
+                UserId = e.UserId,
+                ServerId = e.ServerId,
+                Description = e.Description,
+                Start = e.Start,
+                End = e.End,
+                Created = e.Created
+            };
+        }
+
     }
 }

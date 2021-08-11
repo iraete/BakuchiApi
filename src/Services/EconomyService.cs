@@ -62,9 +62,7 @@ namespace BakuchiApi.Services
 
         public List<User> DistributePoolFunds(Pool pool, Guid winningOutcomeId)
         {
-            if (pool == null 
-                || pool.Wagers == null 
-                || winningOutcomeId == null)
+            if (pool == null || pool.Wagers == null)
             {
                 throw new NullReferenceException();
             }

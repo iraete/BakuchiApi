@@ -29,5 +29,10 @@ namespace BakuchiApi.Models.Dtos
                 LastEdited = r.LastEdited
             };
         }
+
+        public override Result MapDtoToEntity(ResultDto dto)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

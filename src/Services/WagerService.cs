@@ -25,18 +25,18 @@ namespace BakuchiApi.Services
                 && uw.PoolId == eventPoolId);
         }
 
-        public async Task<List<Wager>> GetWagers(Guid userId)
+        public async Task<List<Wager>> RetrieveWagers(Guid userId)
         {
             return await _context.Wagers.Where(
                 uw => uw.UserId == userId).ToListAsync();
         }
 
-        public async Task<Wager> GetWager(Guid userId, Guid eventPoolId)
+        public async Task<Wager> RetrieveWager(Guid userId, Guid eventPoolId)
         {
             return await _context.Wagers.FindAsync(userId, eventPoolId);
         }
 
-        public async Task PutWager(Wager userWager)
+        public async Task UpdateWager(Wager userWager)
         {
             _context.Entry(userWager).State = EntityState.Modified;
 
@@ -57,7 +57,7 @@ namespace BakuchiApi.Services
             }
         }
 
-        public async Task PostWager(Wager userWager)
+        public async Task CreateWager(Wager userWager)
         {
             _context.Wagers.Add(userWager);
 

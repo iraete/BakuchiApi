@@ -8,9 +8,9 @@ namespace BakuchiApi.Services.Interfaces
     public interface IResultService
     {
         bool ResultExists(Guid eventId, uint outcomeId);
-        Task<List<Result>> GetResultsByEvent(Guid eventId);
-        Task PutResult(Result result);
-        Task PostResult(Result result);
+        Task<List<Result>> RetrieveResultsByEvent(Guid eventId);
+        Task UpdateResult(Result result);
+        Task CreateResult(Result result);
         Task DeleteResult(Result result);
     }
 }

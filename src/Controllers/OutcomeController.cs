@@ -21,18 +21,18 @@ namespace BakuchiApi.Controllers
 
         // GET: api/Outcome
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Outcome>>> GetOutcomesByEvent(
+        public async Task<ActionResult<IEnumerable<Outcome>>> RetrieveOutcomesByEvent(
             Guid eventId)
         {
-            return await _service.GetOutcomesByEvent(eventId);
+            return await _service.RetrieveOutcomesByEvent(eventId);
         }
 
         // GET: api/Outcome/5
         [HttpGet]
-        public async Task<ActionResult<Outcome>> GetOutcome(Guid eventId,
+        public async Task<ActionResult<Outcome>> RetrieveOutcome(Guid eventId,
             uint outcomeId)
         {
-            var outcome = await _service.GetOutcome(eventId, outcomeId);
+            var outcome = await _service.RetrieveOutcome(eventId, outcomeId);
 
             if (outcome == null)
             {
@@ -45,7 +45,7 @@ namespace BakuchiApi.Controllers
         // PUT: api/Outcome/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut]
-        public async Task<IActionResult> PutOutcome(Guid eventId,
+        public async Task<IActionResult> UpdateOutcome(Guid eventId,
             uint outcomeId,
             [FromBody] Outcome outcomeDto)
         {
@@ -56,7 +56,7 @@ namespace BakuchiApi.Controllers
 
             try
             {
-                await _service.PutOutcome(outcomeDto);
+                await _service.UpdateOutcome(outcomeDto);
             }
             catch (status.NotFoundException)
             {
@@ -73,7 +73,7 @@ namespace BakuchiApi.Controllers
         // POST: api/Outcome
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Outcome>> PostOutcome(
+        public async Task<ActionResult<Outcome>> CreateOutcome(
             Guid eventId, Outcome outcomeDto)
         {
             if (eventId != outcomeDto.EventId)
@@ -81,8 +81,8 @@ namespace BakuchiApi.Controllers
                 return BadRequest();
             }
 
-            await _service.PostOutcome(outcomeDto);
-            return CreatedAtAction("GetOutcome", new { id = outcomeDto.Id },
+            await _service.CreateOutcome(outcomeDto);
+            return CreatedAtAction("RetrieveOutcome", new { id = outcomeDto.Id },
                 outcomeDto);
         }
 
@@ -91,7 +91,7 @@ namespace BakuchiApi.Controllers
         public async Task<IActionResult> DeleteOutcome(Guid eventId,
             uint outcomeId)
         {
-            var outcome = await _service.GetOutcome(eventId, outcomeId);
+            var outcome = await _service.RetrieveOutcome(eventId, outcomeId);
 
             if (outcome == null)
             {

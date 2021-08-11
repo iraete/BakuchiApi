@@ -24,9 +24,9 @@ namespace BakuchiApi.Controllers
 
         // GET: api/Wager/5
         [HttpGet]
-        public async Task<ActionResult<Wager>> GetWager(Guid userId, Guid poolId)
+        public async Task<ActionResult<Wager>> RetrieveWager(Guid userId, Guid poolId)
         {
-            var wager = await _service.GetWager(userId, poolId);
+            var wager = await _service.RetrieveWager(userId, poolId);
 
             if (wager == null)
             {
@@ -39,7 +39,7 @@ namespace BakuchiApi.Controllers
         // PUT: api/Wager/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut]
-        public async Task<IActionResult> PutWager(Guid userId, Guid poolId,
+        public async Task<IActionResult> UpdateWager(Guid userId, Guid poolId,
             [FromBody] Wager wager)
         {
             if (userId != wager.UserId)
@@ -49,7 +49,7 @@ namespace BakuchiApi.Controllers
 
             try
             {
-                await _service.PutWager(wager);
+                await _service.UpdateWager(wager);
             }
             catch (status.NotFoundException)
             {
@@ -66,11 +66,11 @@ namespace BakuchiApi.Controllers
         // POST: api/Wager
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Wager>> PostWager(Wager wager)
+        public async Task<ActionResult<Wager>> CreateWager(Wager wager)
         {
             try
             {
-                await _service.PostWager(wager);
+                await _service.CreateWager(wager);
             }
             catch (status.ConflictException)
             {
@@ -81,14 +81,14 @@ namespace BakuchiApi.Controllers
                 throw new Exception("Error adding wager");
             }
 
-            return CreatedAtAction("GetWager", new { userId = wager.UserId, poolId = wager.PoolId}, wager);
+            return CreatedAtAction("RetrieveWager", new { userId = wager.UserId, poolId = wager.PoolId}, wager);
         }
 
         // DELETE: api/Wager/5
         [HttpDelete]
         public async Task<IActionResult> DeleteWager(Guid userId, Guid poolId)
         {
-            var wager = await _service.GetWager(userId, poolId);
+            var wager = await _service.RetrieveWager(userId, poolId);
 
             if (wager == null)
             {
