@@ -5,6 +5,9 @@ project.lock.json
 *.pyc
 nupkg/
 
+# Github workflows
+.github
+
 # Visual Studio Code
 .vscode
 
