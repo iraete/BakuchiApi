@@ -14,14 +14,14 @@ namespace BakuchiApi.Models
         public Guid UserId { get; set; }
 
         // Server it originated from
-        public Guid ServerId { get; set; }
+        public long? ServerId { get; set; }
         
         public string Description { get; set; }
 
         // Determines when betting pools close
         public DateTime Start { get; set; }
         public DateTime End { get; set; }
-        public DateTime Created { get; set; }
+        public DateTime? Created { get; set; }
 
         // Navigation Properties
         public User User { get; set; }

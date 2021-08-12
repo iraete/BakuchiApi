@@ -8,6 +8,8 @@ namespace BakuchiApi.Models.Configuration
         public void Configure(EntityTypeBuilder<Pool> builder)
         {
             builder.Property(p => p.Id).HasDefaultValueSql("uuid_generate_v4()");
+            builder.Property(p => p.Alias).HasMaxLength(50); 
+            builder.Property(p => p.Description).HasMaxLength(100);           
             builder.HasOne(p => p.Event)
                 .WithMany(ev => ev.Pools)
                 .HasForeignKey(p => p.EventId)
@@ -16,8 +18,6 @@ namespace BakuchiApi.Models.Configuration
             builder.Property(e => e.BetType)
                 .IsRequired();
 
-            builder.Property(e => e.Description)
-                .IsRequired();
         }
     }
 }

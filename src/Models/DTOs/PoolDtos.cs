@@ -6,8 +6,8 @@ namespace BakuchiApi.Models.Dtos
     public class PoolDto : BaseIdDto
     {
         public Guid EventId { get; set; }
+        public string Alias { get; set; }
         public BetType BetType { get; set; }
-        public double PoolNum { get; set; }
         public double TotalWagers { get; set; }
         public string Description { get; set; }
     }
@@ -16,7 +16,6 @@ namespace BakuchiApi.Models.Dtos
     {
         public Guid EventId { get; set; }
         public BetType BetType { get; set; }
-        public double PoolNum { get; set; }
         public string Description { get; set; }
     }
 
@@ -28,8 +27,8 @@ namespace BakuchiApi.Models.Dtos
             {
                 Id = p.Id,
                 EventId = p.EventId,
+                Alias = p.Alias,
                 BetType = p.BetType,
-                PoolNum = p.PoolNum,
                 TotalWagers = p.TotalWagers,
                 Description = p.Description
             };

@@ -30,9 +30,9 @@ namespace BakuchiApi.Controllers
         // GET: api/Outcome/5
         [HttpGet]
         public async Task<ActionResult<Outcome>> RetrieveOutcome(Guid eventId,
-            uint outcomeId)
+            string alias)
         {
-            var outcome = await _service.RetrieveOutcome(eventId, outcomeId);
+            var outcome = await _service.RetrieveOutcome(eventId, alias);
 
             if (outcome == null)
             {
@@ -46,10 +46,10 @@ namespace BakuchiApi.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut]
         public async Task<IActionResult> UpdateOutcome(Guid eventId,
-            uint outcomeId,
+            string alias,
             [FromBody] Outcome outcomeDto)
         {
-            if (eventId != outcomeDto.EventId || outcomeId != outcomeDto.Id)
+            if (eventId != outcomeDto.EventId || alias != outcomeDto.Alias)
             {
                 return BadRequest();
             }
@@ -82,16 +82,16 @@ namespace BakuchiApi.Controllers
             }
 
             await _service.CreateOutcome(outcomeDto);
-            return CreatedAtAction("RetrieveOutcome", new { id = outcomeDto.Id },
+            return CreatedAtAction("RetrieveOutcome", new { alias = outcomeDto.Alias },
                 outcomeDto);
         }
 
         // DELETE: api/Outcome/5
         [HttpDelete]
         public async Task<IActionResult> DeleteOutcome(Guid eventId,
-            uint outcomeId)
+            string alias)
         {
-            var outcome = await _service.RetrieveOutcome(eventId, outcomeId);
+            var outcome = await _service.RetrieveOutcome(eventId, alias);
 
             if (outcome == null)
             {

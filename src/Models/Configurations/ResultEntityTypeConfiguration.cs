@@ -7,6 +7,8 @@ namespace BakuchiApi.Models.Configuration
     {
         public void Configure(EntityTypeBuilder<Result> builder)
         {
+            builder.Property(r => r.LastEdited)
+                   .HasDefaultValueSql("localtimestamp");
             builder.HasKey(r => new { r.EventId, r.OutcomeId });
             builder.HasIndex(r => new {r.EventId, r.Rank}).IsUnique();
         }

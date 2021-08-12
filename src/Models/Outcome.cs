@@ -5,7 +5,6 @@ namespace BakuchiApi.Models
 {
     public class Outcome
     {
-        public uint Id { get; set; }
         public Guid EventId { get; set; }
         public string Alias { get; set; }
         public string Name { get; set; }
@@ -13,8 +12,5 @@ namespace BakuchiApi.Models
 
         // Navigation Properties
         public Event Event { get; set; }
-        /* Event is the principal entity in the one-to-many relationship with
-           Pool */
-        public virtual List<Pool> Pools { get; set; }
     }
 }

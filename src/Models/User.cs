@@ -6,9 +6,10 @@ namespace BakuchiApi.Models
     public class User
     {
         public Guid Id { get; set; }
-        public long DiscordId { get; set; }
-        public double Balance { get; set; }
+        public long? DiscordId { get; set; }
         public string Name { get; set; }
+        public string Email { get; set; }
+        public double Balance { get; set; }
         public DateTime LastRewardTime { get; set; }
 
         public virtual List<Event> Events { get; set; }

@@ -5,7 +5,7 @@ namespace BakuchiApi.Models.Dtos
     public class UserDto : BaseIdDto
     {
         public string Name { get; set; }
-        public long DiscordId { get; set; }
+        public long? DiscordId { get; set; }
         public int Balance { get; set; }
         public DateTime LastRewardTime { get; set; }
     }
@@ -13,13 +13,15 @@ namespace BakuchiApi.Models.Dtos
     public class UpdateUserDto : BaseIdDto
     {
         public string Name { get; set; }
-        public long DiscordId { get; set; }
+        public string Email { get; set; }
+        public long? DiscordId { get; set; }
     }
 
     public class InputUserDto
     {
         public string Name { get; set; }
-        public long DiscordId { get; set; }
+        public string Email { get; set; }
+        public long? DiscordId { get; set; }
     }
 
 
@@ -54,6 +56,7 @@ namespace BakuchiApi.Models.Dtos
             return new User
             {
                 Name = dto.Name,
+                Email = dto.Email,
                 DiscordId = dto.DiscordId
             };
         }
@@ -64,6 +67,7 @@ namespace BakuchiApi.Models.Dtos
             {
                 Id = dto.Id,
                 Name = dto.Name,
+                Email = dto.Email,
                 DiscordId = dto.DiscordId
             };
         }

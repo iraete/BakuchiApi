@@ -25,9 +25,9 @@ namespace BakuchiApi.Services
                 .ToListAsync();
         }
 
-        public async Task<Outcome> RetrieveOutcome(Guid eventId, uint outcomeId)
+        public async Task<Outcome> RetrieveOutcome(Guid eventId, string alias)
         {
-            return await _context.Outcomes.FindAsync(eventId, outcomeId);
+            return await _context.Outcomes.FindAsync(eventId, alias);
         }
 
         public async Task UpdateOutcome(Outcome outcome)
@@ -40,7 +40,7 @@ namespace BakuchiApi.Services
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!OutcomeExists(outcome.EventId, outcome.Id))
+                if (!OutcomeExists(outcome.EventId, outcome.Alias))
                 {
                     throw new status.NotFoundException();
                 }
@@ -63,10 +63,10 @@ namespace BakuchiApi.Services
             await _context.SaveChangesAsync();
         }
 
-        public bool OutcomeExists(Guid eventId, uint outcomeId)
+        public bool OutcomeExists(Guid eventId, string alias)
         {
             return _context.Outcomes.Any(o => o.EventId == eventId
-                && o.Id == outcomeId);
+                && o.Alias == alias);
         }
     }
 }
