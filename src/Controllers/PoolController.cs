@@ -67,7 +67,11 @@ namespace BakuchiApi.Controllers
 
             try
             {
-                await _service.UpdatePool(pool);
+                var entity = await _service.RetrievePool(id);
+                entity.Alias = pool.Alias;
+                entity.BetType = pool.BetType;
+                entity.Description = pool.Description;
+                await _service.UpdatePool(entity);
             }
             catch (status.NotFoundException)
             {

@@ -31,6 +31,7 @@ namespace BakuchiApi.Services
 
         public async Task UpdateResult(Result result)
         {
+            result.LastEdited = DateTime.Now;
             _context.Entry(result).State = EntityState.Modified;
 
             try

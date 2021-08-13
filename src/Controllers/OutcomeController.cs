@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using BakuchiApi.Models;
+using BakuchiApi.Models.Dtos;
 using BakuchiApi.Services.Interfaces;
 using status = BakuchiApi.StatusExceptions;
 
@@ -13,10 +14,12 @@ namespace BakuchiApi.Controllers
     public class OutcomeController : ControllerBase
     {
         private readonly IOutcomeService _service;
+        private OutcomeDtoMapper _outcomeMapper;
 
         public OutcomeController(IOutcomeService service)
         {
             _service = service;
+            _outcomeMapper = new OutcomeDtoMapper();
         }
 
         // GET: api/Outcome
@@ -29,7 +32,7 @@ namespace BakuchiApi.Controllers
 
         // GET: api/Outcome/5
         [HttpGet]
-        public async Task<ActionResult<Outcome>> RetrieveOutcome(Guid eventId,
+        public async Task<ActionResult<OutcomeDto>> RetrieveOutcome(Guid eventId,
             string alias)
         {
             var outcome = await _service.RetrieveOutcome(eventId, alias);
@@ -39,7 +42,7 @@ namespace BakuchiApi.Controllers
                 return NotFound();
             }
 
-            return outcome;
+            return _outcomeMapper.MapEntityToDto(outcome);
         }
 
         // PUT: api/Outcome/5
@@ -47,16 +50,21 @@ namespace BakuchiApi.Controllers
         [HttpPut]
         public async Task<IActionResult> UpdateOutcome(Guid eventId,
             string alias,
-            [FromBody] Outcome outcomeDto)
+            [FromBody] UpdateOutcomeDto outcomeDto)
         {
             if (eventId != outcomeDto.EventId || alias != outcomeDto.Alias)
             {
                 return BadRequest();
             }
 
+            var outcome = _outcomeMapper.MapUpdateDtoToEntity(outcomeDto);
+
             try
             {
-                await _service.UpdateOutcome(outcomeDto);
+                var entity = await _service.RetrieveOutcome(eventId, alias);
+                entity.Alias = outcome.Alias;
+                entity.Name = outcome.Name;
+                await _service.UpdateOutcome(outcome);
             }
             catch (status.NotFoundException)
             {
@@ -64,7 +72,7 @@ namespace BakuchiApi.Controllers
             }
             catch
             {
-                throw new Exception("Error adding event outcome");
+                throw new Exception("Error updating event outcome");
             }
 
             return NoContent();
@@ -74,16 +82,18 @@ namespace BakuchiApi.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<Outcome>> CreateOutcome(
-            Guid eventId, Outcome outcomeDto)
+            Guid eventId, CreateOutcomeDto outcomeDto)
         {
             if (eventId != outcomeDto.EventId)
             {
                 return BadRequest();
             }
 
-            await _service.CreateOutcome(outcomeDto);
-            return CreatedAtAction("RetrieveOutcome", new { alias = outcomeDto.Alias },
-                outcomeDto);
+            var outcome = _outcomeMapper.MapCreateDtoToEntity(outcomeDto);
+            await _service.CreateOutcome(outcome);
+            return CreatedAtAction("RetrieveOutcome", new { eventId = eventId, 
+                alias = outcomeDto.Alias },
+                _outcomeMapper.MapEntityToDto(outcome));
         }
 
         // DELETE: api/Outcome/5

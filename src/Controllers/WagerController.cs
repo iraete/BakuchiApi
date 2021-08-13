@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BakuchiApi.Models;
+using BakuchiApi.Models.Dtos;
 using BakuchiApi.Services.Interfaces;
 using status = BakuchiApi.StatusExceptions;
 
@@ -16,15 +17,17 @@ namespace BakuchiApi.Controllers
     public class WagerController : ControllerBase
     {
         private readonly IWagerService _service;
+        private WagerDtoMapper _wagerMapper;
 
         public WagerController(IWagerService service)
         {
             _service = service;
+            _wagerMapper = new WagerDtoMapper();
         }
 
         // GET: api/Wager/5
         [HttpGet]
-        public async Task<ActionResult<Wager>> RetrieveWager(Guid userId, Guid poolId)
+        public async Task<ActionResult<WagerDto>> RetrieveWager(Guid userId, Guid poolId)
         {
             var wager = await _service.RetrieveWager(userId, poolId);
 
@@ -33,19 +36,21 @@ namespace BakuchiApi.Controllers
                 return NotFound();
             }
 
-            return wager;
+            return _wagerMapper.MapEntityToDto(wager);
         }
 
         // PUT: api/Wager/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut]
         public async Task<IActionResult> UpdateWager(Guid userId, Guid poolId,
-            [FromBody] Wager wager)
+            [FromBody] UpdateWagerDto wagerDto)
         {
-            if (userId != wager.UserId)
+            if (userId != wagerDto.UserId)
             {
                 return BadRequest();
             }
+
+            var wager = _wagerMapper.MapUpdateDtoToEntity(wagerDto);
 
             try
             {
@@ -66,8 +71,11 @@ namespace BakuchiApi.Controllers
         // POST: api/Wager
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Wager>> CreateWager(Wager wager)
+        public async Task<ActionResult<WagerDto>> CreateWager(
+            CreateWagerDto wagerDto)
         {
+            var wager = _wagerMapper.MapCreateDtoToEntity(wagerDto);
+
             try
             {
                 await _service.CreateWager(wager);
@@ -81,7 +89,12 @@ namespace BakuchiApi.Controllers
                 throw new Exception("Error adding wager");
             }
 
-            return CreatedAtAction("RetrieveWager", new { userId = wager.UserId, poolId = wager.PoolId}, wager);
+            return CreatedAtAction("RetrieveWager", new 
+                { 
+                    userId = wager.UserId, 
+                    poolId = wager.PoolId
+                },
+                _wagerMapper.MapEntityToDto(wager));
         }
 
         // DELETE: api/Wager/5

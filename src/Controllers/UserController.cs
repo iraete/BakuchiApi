@@ -73,7 +73,11 @@ namespace BakuchiApi.Controllers
 
             try 
             {
-                await _service.UpdateUser(user);
+                var entity = await _service.RetrieveUser(id);
+                entity.Name = user.Name;
+                entity.DiscordId = user.DiscordId;
+                entity.Email = user.Email;
+                await _service.UpdateUser(entity);
             }
             catch (status.NotFoundException)
             {

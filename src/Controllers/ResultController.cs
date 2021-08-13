@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BakuchiApi.Models;
+using BakuchiApi.Models.Dtos;
 using BakuchiApi.Services.Interfaces;
 
 namespace BakuchiApi.Controllers
@@ -16,6 +17,7 @@ namespace BakuchiApi.Controllers
     {
         private readonly IResultService _resultService;
         private readonly IEventService _eventService;
+        private ResultDtoMapper _resultMapper;
 
         public ResultController(
             IResultService resultService,
@@ -23,23 +25,24 @@ namespace BakuchiApi.Controllers
         {
             _resultService = resultService;
             _eventService = eventService;
+            _resultMapper = new ResultDtoMapper();
         }
 
         // GET: api/Result
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Result>>>
+        public async Task<ActionResult<IEnumerable<ResultDto>>>
             RetrieveResultsByEvent(Guid eventId)
         {
-            return await _resultService.RetrieveResultsByEvent(eventId);
+            var results = await _resultService.RetrieveResultsByEvent(eventId);
+            return _resultMapper.MapEntitiesToDtos(results);
         }
 
         // PUT: api/Result/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut]
-        public async Task<IActionResult> UpdateResults(Guid eventId, Result[] resultDtos)
+        public async Task<IActionResult> UpdateResults(Guid eventId, 
+            UpdateResultDto[] resultDtos)
         {
-            var tasks = new List<Task>();
-
             foreach (var r in resultDtos)
             {
                 if (eventId != r.EventId)
@@ -48,7 +51,9 @@ namespace BakuchiApi.Controllers
                 }
             }
 
-            await ProcessResults(resultDtos, _resultService.UpdateResult);
+            await ProcessDtos(resultDtos,
+                _resultMapper.MapUpdateDtoToEntity,
+                _resultService.UpdateResult);
 
             return NoContent();
         }
@@ -56,7 +61,8 @@ namespace BakuchiApi.Controllers
         // POST: api/Result
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Result>> CreateResults(Guid eventId, Result[] resultDtos)
+        public async Task<ActionResult<Result>> CreateResults(Guid eventId, 
+            CreateResultDto[] resultDtos)
         {
             foreach (var r in resultDtos)
             {
@@ -66,9 +72,12 @@ namespace BakuchiApi.Controllers
                 }
             }
 
-            await ProcessResults(resultDtos, _resultService.CreateResult);
+            await ProcessDtos(resultDtos, 
+                _resultMapper.MapCreateDtoToEntity, 
+                _resultService.CreateResult);
 
-            return CreatedAtAction("RetrieveResultByEvent", new { eventId = eventId }, eventId);
+            return CreatedAtAction("RetrieveResultsByEvent", 
+                new { eventId = eventId }, eventId);
         }
 
         // DELETE: api/Result/5
@@ -83,19 +92,31 @@ namespace BakuchiApi.Controllers
             }
 
             var results = await _resultService.RetrieveResultsByEvent(eventId);
-            await ProcessResults(results, _resultService.DeleteResult);
+            var tasks = new List<Task>();
 
+            foreach (var r in results)
+            {
+                tasks.Add(_resultService.DeleteResult(r));
+            }
+
+            await Task.WhenAll(tasks);
             return NoContent();
         }
 
-        private async Task ProcessResults(IEnumerable<Result> resultDtos,
-            Func<Result, Task> func)
+        private async Task ProcessDtos<TSource>(
+                IEnumerable<TSource> resultDtos,
+                Func<TSource, Result> convert,
+                Func<Result, Task> process)
         {
+            var results = new List<Result>();
             var tasks = new List<Task>();
-
-            foreach (var r in resultDtos)
+            foreach(var dto in resultDtos)
             {
-                tasks.Add(func(r));
+                results.Add(convert(dto));
+            }
+            foreach (var r in results)
+            {
+                tasks.Add(process(r));
             }
 
             await Task.WhenAll(tasks);

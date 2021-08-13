@@ -47,13 +47,23 @@ namespace BakuchiApi.Controllers
 
         // PUT: api/Event
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut]
-        public async Task<IActionResult> UpdateEvent(UpdateEventDto eventDto)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateEvent(
+            Guid id, UpdateEventDto eventDto)
         {
+            if (id != eventDto.Id)
+            {
+                return BadRequest();
+            }
+
             var @event = _eventMapper.MapUpdateDtoToEntity(eventDto);
             try
             {
-                await _service.UpdateEvent(@event);
+                var entity = await _service.RetrieveEvent(id);
+                entity.Description = @event.Description;
+                entity.Start = @event.Start;
+                entity.End = @event.End;
+                await _service.UpdateEvent(entity);
             }
             catch (status.NotFoundException)
             {

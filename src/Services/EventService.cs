@@ -34,7 +34,7 @@ namespace BakuchiApi.Services
             _context.Entry(eventObj).State = EntityState.Modified;
 
             try
-            {
+            {                
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
