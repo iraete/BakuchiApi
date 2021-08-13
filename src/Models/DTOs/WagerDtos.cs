@@ -24,7 +24,11 @@ namespace BakuchiApi.Models.Dtos
         public double Amount { get; set; }
     }
 
-    public class WagerDtoMapper : DtoMapper<Wager, WagerDto>
+    public class UpdateWagerDto : CreateWagerDto
+    { }
+
+    public class WagerDtoMapper : DtoMapper<Wager, WagerDto, 
+        UpdateWagerDto, CreateWagerDto>
     {
         public override WagerDto MapEntityToDto(Wager w)
         {
@@ -42,7 +46,32 @@ namespace BakuchiApi.Models.Dtos
 
         public override Wager MapDtoToEntity(WagerDto dto)
         {
-            throw new NotImplementedException();
+            return new Wager
+            {
+                UserId = dto.UserId,
+                DiscordId = dto.DiscordId,
+                EventId = dto.EventId,
+                PoolId = dto.PoolId,
+                OutcomeId = dto.OutcomeId,
+                Amount = (int) dto.Amount,
+                BetType = dto.BetType
+            };
         }
+
+        public override Wager MapCreateDtoToEntity(CreateWagerDto dto)
+        {
+            return new Wager
+            {
+                UserId = dto.UserId,
+                DiscordId = dto.DiscordId,
+                EventId = dto.EventId,
+                PoolId = dto.PoolId,
+                OutcomeId = dto.OutcomeId,
+                Amount = (int) dto.Amount,
+            };
+        }
+
+        public override Wager MapUpdateDtoToEntity(UpdateWagerDto dto)
+            => MapCreateDtoToEntity(dto);
     }
 }

@@ -15,26 +15,26 @@ namespace BakuchiApi.Controllers
     public class EventController : ControllerBase
     {
         private IEventService _service;
+        private EventDtoMapper _eventMapper;
 
         public EventController(IEventService service)
         {
             _service = service;
+            _eventMapper = new EventDtoMapper();
         }
 
         // GET: api/Event
         [HttpGet]
         public async Task<ActionResult<IEnumerable<EventDto>>> RetrieveEvents()
         {
-            var mapper = new EventDtoMapper();
             var events = await _service.RetrieveEvents();
-            return mapper.MapEntitiesToDtos(events);
+            return _eventMapper.MapEntitiesToDtos(events);
         }
 
         // GET: api/Event/?alias=bakuchi&userid=2000&serverid=1000
         [HttpGet]
         public async Task<ActionResult<EventDto>> RetrieveEvent(Guid eventId)
         {
-            var mapper = new EventDtoMapper();
             var @event = await _service.RetrieveEvent(eventId);
 
             if (@event == null)
@@ -42,16 +42,15 @@ namespace BakuchiApi.Controllers
                 return NotFound();
             }
 
-            return mapper.MapEntityToDto(@event);
+            return _eventMapper.MapEntityToDto(@event);
         }
 
         // PUT: api/Event
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut]
-        public async Task<IActionResult> UpdateEvent(EventDto dto)
+        public async Task<IActionResult> UpdateEvent(UpdateEventDto eventDto)
         {
-            var mapper = new EventDtoMapper();
-            var @event = mapper.MapDtoToEntity(dto);
+            var @event = _eventMapper.MapUpdateDtoToEntity(eventDto);
             try
             {
                 await _service.UpdateEvent(@event);
@@ -71,18 +70,10 @@ namespace BakuchiApi.Controllers
         // POST: api/Event
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<EventDto>> CreateEvent(CreateEventDto eventDto)
+        public async Task<ActionResult<EventDto>> 
+            CreateEvent(CreateEventDto eventDto)
         {
-            var @event = new Event
-            {
-                Name = eventDto.Name,
-                Alias = eventDto.Alias,
-                UserId = eventDto.UserId,
-                ServerId = eventDto.ServerId,
-                Description = eventDto.Description,
-                Start = eventDto.Start,
-                End = eventDto.End
-            };
+            var @event = _eventMapper.MapCreateDtoToEntity(eventDto);
             
             try
             {
@@ -97,7 +88,8 @@ namespace BakuchiApi.Controllers
                 throw new Exception("Error adding event.");
             }
 
-            return CreatedAtAction("RetrieveEvent", new { id = @event.Id }, @event);
+            return CreatedAtAction("RetrieveEvent", new { id = @event.Id }, 
+                _eventMapper.MapEntityToDto(@event));
         }
 
         // DELETE: api/Event/?alias=bakuchi&userid=2000&serverid=1000

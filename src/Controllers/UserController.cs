@@ -90,9 +90,9 @@ namespace BakuchiApi.Controllers
         // POST: api/User
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<User>> CreateUser(InputUserDto userDto)
+        public async Task<ActionResult<User>> CreateUser(CreateUserDto userDto)
         {
-            var user = _mapper.MapInputDtoToEntity(userDto);
+            var user = _mapper. MapCreateDtoToEntity(userDto);
 
             await _service.CreateUser(user);
             return CreatedAtAction("RetrieveUser", new { id = user.Id },

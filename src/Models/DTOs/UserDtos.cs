@@ -17,7 +17,7 @@ namespace BakuchiApi.Models.Dtos
         public long? DiscordId { get; set; }
     }
 
-    public class InputUserDto
+    public class CreateUserDto
     {
         public string Name { get; set; }
         public string Email { get; set; }
@@ -25,7 +25,8 @@ namespace BakuchiApi.Models.Dtos
     }
 
 
-    public class UserDtoMapper : DtoMapper<User, UserDto>
+    public class UserDtoMapper : DtoMapper<User, UserDto, 
+        UpdateUserDto, CreateUserDto>
     {
         public override UserDto MapEntityToDto(User u)
         {
@@ -51,7 +52,7 @@ namespace BakuchiApi.Models.Dtos
             };
         }
 
-        public User MapInputDtoToEntity(InputUserDto dto)
+        public override User MapCreateDtoToEntity(CreateUserDto dto)
         {
             return new User
             {
@@ -61,7 +62,7 @@ namespace BakuchiApi.Models.Dtos
             };
         }
 
-        public User MapUpdateDtoToEntity(UpdateUserDto dto)
+        public override User MapUpdateDtoToEntity(UpdateUserDto dto)
         {
             return new User
             {

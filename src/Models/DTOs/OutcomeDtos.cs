@@ -17,7 +17,11 @@ namespace BakuchiApi.Models.Dtos
         public string Name { get; set; }
     }
 
-    public class OutcomeDtoMapper : DtoMapper<Outcome, OutcomeDto>
+    public class UpdateOutcomeDto : CreateOutcomeDto
+    { }
+
+    public class OutcomeDtoMapper : DtoMapper<Outcome, OutcomeDto,
+        UpdateOutcomeDto, CreateOutcomeDto>
     {
         public override OutcomeDto MapEntityToDto(Outcome outcome)
         {
@@ -32,7 +36,25 @@ namespace BakuchiApi.Models.Dtos
 
         public override Outcome MapDtoToEntity(OutcomeDto dto)
         {
-            throw new NotImplementedException();
+            return new Outcome
+            {
+                EventId = dto.EventId,
+                Alias = dto.Alias,
+                Name = dto.Name,
+            };
         }
+
+        public override Outcome MapCreateDtoToEntity(CreateOutcomeDto dto)
+        {
+            return new Outcome
+            {
+                EventId = dto.EventId,
+                Alias = dto.Alias,
+                Name = dto.Name,
+            };
+        }
+
+        public override Outcome MapUpdateDtoToEntity(UpdateOutcomeDto dto) 
+            => MapCreateDtoToEntity(dto);
     }
 }
