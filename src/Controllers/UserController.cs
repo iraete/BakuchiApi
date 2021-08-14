@@ -83,6 +83,10 @@ namespace BakuchiApi.Controllers
             {
                 return NotFound();
             }
+            catch (status.ConflictException)
+            {
+                return Conflict();
+            }
             catch
             {
                 throw new Exception("Error updating user");
@@ -98,7 +102,18 @@ namespace BakuchiApi.Controllers
         {
             var user = _mapper. MapCreateDtoToEntity(userDto);
 
-            await _service.CreateUser(user);
+            try
+            {            
+                await _service.CreateUser(user);
+            }
+            catch (status.ConflictException)
+            {
+                return Conflict();
+            }
+            catch
+            {
+                throw new Exception("Error creating user");
+            }
             return CreatedAtAction("RetrieveUser", new { id = user.Id },
                  _mapper.MapEntityToDto(user));
         }

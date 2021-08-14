@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using BakuchiApi.Models;
 using BakuchiApi.Models.Dtos;
 using BakuchiApi.Services.Interfaces;
 using status = BakuchiApi.StatusExceptions;
@@ -14,28 +13,32 @@ namespace BakuchiApi.Controllers
     [ApiController]
     public class EventController : ControllerBase
     {
-        private IEventService _service;
+        private IEventService _eventService;
+        private IUserService _userService;
         private EventDtoMapper _eventMapper;
+        private UserDtoMapper _userMapper;
 
-        public EventController(IEventService service)
+        public EventController(IEventService eventService, IUserService userService)
         {
-            _service = service;
+            _eventService = eventService;
+            _userService = userService;
             _eventMapper = new EventDtoMapper();
+            _userMapper = new UserDtoMapper();
         }
 
         // GET: api/Event
         [HttpGet]
         public async Task<ActionResult<IEnumerable<EventDto>>> RetrieveEvents()
         {
-            var events = await _service.RetrieveEvents();
+            var events = await _eventService.RetrieveEvents();
             return _eventMapper.MapEntitiesToDtos(events);
         }
 
         // GET: api/Event/?alias=bakuchi&userid=2000&serverid=1000
-        [HttpGet]
+        [HttpGet("{id}")]
         public async Task<ActionResult<EventDto>> RetrieveEvent(Guid eventId)
         {
-            var @event = await _service.RetrieveEvent(eventId);
+            var @event = await _eventService.RetrieveEvent(eventId);
 
             if (@event == null)
             {
@@ -51,7 +54,8 @@ namespace BakuchiApi.Controllers
         public async Task<IActionResult> UpdateEvent(
             Guid id, UpdateEventDto eventDto)
         {
-            if (id != eventDto.Id)
+            if (id != eventDto.Id 
+                || !ValidateDates(eventDto.Start, eventDto.End))
             {
                 return BadRequest();
             }
@@ -59,11 +63,11 @@ namespace BakuchiApi.Controllers
             var @event = _eventMapper.MapUpdateDtoToEntity(eventDto);
             try
             {
-                var entity = await _service.RetrieveEvent(id);
+                var entity = await _eventService.RetrieveEvent(id);
                 entity.Description = @event.Description;
                 entity.Start = @event.Start;
                 entity.End = @event.End;
-                await _service.UpdateEvent(entity);
+                await _eventService.UpdateEvent(entity);
             }
             catch (status.NotFoundException)
             {
@@ -83,11 +87,33 @@ namespace BakuchiApi.Controllers
         public async Task<ActionResult<EventDto>> 
             CreateEvent(CreateEventDto eventDto)
         {
+            if (!ValidateDates(eventDto.Start, eventDto.End))
+            {
+                return BadRequest();
+            }
+
+            if (!_userService.DiscordIdExists(eventDto.DiscordId))
+            {
+                try
+                {
+                    await CreateUser(eventDto);
+                }
+                catch(status.ConflictException)
+                {
+                    return Conflict("Error registering user");
+                }
+                catch(Exception)
+                {
+                    throw new Exception("Error registering user");
+                }
+
+            }
+
             var @event = _eventMapper.MapCreateDtoToEntity(eventDto);
             
             try
             {
-                await _service.CreateEvent(@event);
+                await _eventService.CreateEvent(@event);
             }
             catch (status.ConflictException)
             {
@@ -103,19 +129,35 @@ namespace BakuchiApi.Controllers
         }
 
         // DELETE: api/Event/?alias=bakuchi&userid=2000&serverid=1000
-        [HttpDelete]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteEvent(Guid eventId)
         {
-            var @event = await _service.RetrieveEvent(eventId);
+            var @event = await _eventService.RetrieveEvent(eventId);
 
             if (@event == null)
             {
                 return NotFound();
             }
 
-            await _service.DeleteEvent(@event);
+            await _eventService.DeleteEvent(@event);
             return NoContent();
         }
 
+        private bool ValidateDates(DateTime start, DateTime end)
+        {
+            return start < end;
+        }
+
+        private async Task CreateUser(CreateEventDto eventDto)
+        {
+            var user = _userMapper.MapCreateDtoToEntity(
+                    new CreateUserDto {
+                        Name = eventDto.UserName,
+                        DiscordId = eventDto.DiscordId
+                    }
+                );
+            await _userService.CreateUser(user);
+            eventDto.UserId = user.Id;
+        }
     }
 }

@@ -8,6 +8,7 @@ namespace BakuchiApi.Services.Interfaces
     public interface IUserService
     {
         bool UserExists(Guid id);
+        bool DiscordIdExists(long? id);
         Task<List<User>> RetrieveUsers();
         Task<User> RetrieveUser(Guid id);
         Task<User> RetrieveUserByDiscordId(long discordId);

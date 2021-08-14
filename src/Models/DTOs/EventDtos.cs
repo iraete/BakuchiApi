@@ -20,6 +20,7 @@ namespace BakuchiApi.Models.Dtos
         public string UserName { get; set; }
         public string Alias { get; set; }
         public Guid UserId { get; set; }
+        public long? DiscordId { get; set; }
         public long? ServerId { get; set; }
         public string Description { get; set; }
         public DateTime Start { get; set; }

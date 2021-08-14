@@ -48,6 +48,11 @@ namespace BakuchiApi.Services
                 {
                     throw new status.NotFoundException();
                 }
+                else if (user.DiscordId != null 
+                    && !DiscordIdExists(user.DiscordId))
+                {
+                    throw new status.ConflictException();
+                }
                 else
                 {
                     throw;
@@ -60,7 +65,23 @@ namespace BakuchiApi.Services
         {
             user.Id = Guid.NewGuid();
             _context.Users.Add(user);
-            await _context.SaveChangesAsync();
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (user.DiscordId != null 
+                    && !DiscordIdExists(user.DiscordId))
+                {
+                    throw new status.ConflictException();
+                }
+                else
+                {
+                    throw;
+                }
+            }
         }
 
         public async Task DeleteUser(User user)
@@ -82,6 +103,11 @@ namespace BakuchiApi.Services
         public bool UserExists(Guid id)
         {
             return _context.Users.Any(e => e.Id == id);
+        }
+
+        public bool DiscordIdExists(long? id)
+        {
+            return _context.Users.Any(e => e.DiscordId == id);
         }
     }
 }
