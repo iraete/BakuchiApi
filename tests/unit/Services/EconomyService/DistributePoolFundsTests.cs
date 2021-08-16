@@ -7,7 +7,7 @@ using BakuchiApi.Models;
 using NUnit.Framework;
 using Moq;
 
-namespace BakuchiApi.Tests.UnitTests.Services
+namespace BakuchiApi.Tests.UnitTests.Services.EconomyServiceTests
 {
     internal class DistributePoolFundsTests
     {   
