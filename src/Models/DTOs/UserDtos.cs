@@ -13,14 +13,12 @@ namespace BakuchiApi.Models.Dtos
     public class UpdateUserDto : BaseIdDto
     {
         public string Name { get; set; }
-        public string Email { get; set; }
         public long? DiscordId { get; set; }
     }
 
     public class CreateUserDto
     {
         public string Name { get; set; }
-        public string Email { get; set; }
         public long? DiscordId { get; set; }
     }
 
@@ -57,7 +55,6 @@ namespace BakuchiApi.Models.Dtos
             return new User
             {
                 Name = dto.Name,
-                Email = dto.Email,
                 DiscordId = dto.DiscordId
             };
         }
@@ -68,7 +65,6 @@ namespace BakuchiApi.Models.Dtos
             {
                 Id = dto.Id,
                 Name = dto.Name,
-                Email = dto.Email,
                 DiscordId = dto.DiscordId
             };
         }

@@ -110,6 +110,10 @@ namespace BakuchiApi.Controllers
             {
                 return Conflict();
             }
+            catch (NullReferenceException)
+            {
+                return BadRequest();
+            }
             catch
             {
                 throw new Exception("Error creating user");
