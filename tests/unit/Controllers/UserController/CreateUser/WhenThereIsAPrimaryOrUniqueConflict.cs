@@ -8,37 +8,51 @@ using BakuchiApi.Controllers;
 using NUnit.Framework;
 using Moq;
 
-namespace BakuchiApi.Tests.IntegrationTests.Controllers.UserControllerTests
+namespace BakuchiApi.Tests.UnitTests.Controllers
+    .UserControllerTests.CreateUser
 {
     internal class WhenThereIsAPrimaryOrUniqueConflict
     {
         private readonly Guid id = Guid.NewGuid();
         private Mock<IUserService> userServiceMock;
-        private CreateUserDto newUser;
         private UserController userController;
+        private ActionResult<User> result;
 
         [SetUp]
-        public void Setup()
+        public async Task Setup()
         {
-            newUser = new CreateUserDto
+            var newUser = new CreateUserDto
             {
-                Name = "Example",
-                DiscordId = 1000,
-                Email = "nothing@nothing.com"
+                Name = "John Doe",
+                DiscordId = 1000
             };
+            
             userServiceMock = new Mock<IUserService>();
             userServiceMock.Setup(
                 usm => usm.CreateUser(It.IsAny<User>())
             ).ThrowsAsync(new StatusExceptions.ConflictException());
-
             userController = new UserController(userServiceMock.Object);
+            result = await userController.CreateUser(newUser);
         }
 
         [Test]
-        public async Task AssertConflictResponseIsReturned()
+        public void AssertResponseIsNotNull()
         {
-            var result = await userController.CreateUser(newUser);
+            Assert.IsNotNull(result);
+        }
+
+        [Test]
+        public void  AssertConflictResponseIsReturned()
+        {
             Assert.IsInstanceOf<ConflictResult>(result.Result);
+        }
+
+        [Test]
+        public void AssertCondition()
+        {
+            userServiceMock.Verify(
+                _ => _.CreateUser(It.IsAny<User>()),
+                Times.Exactly(1));
         }
     }
 }

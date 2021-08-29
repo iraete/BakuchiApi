@@ -4,10 +4,12 @@ using BakuchiApi.Services.Interfaces;
 using BakuchiApi.Models;
 using BakuchiApi.Models.Dtos;
 using BakuchiApi.Controllers;
+using Microsoft.AspNetCore.Mvc;
 using NUnit.Framework;
 using Moq;
 
-namespace BakuchiApi.Tests.IntegrationTests.Controllers.UserControllerTests
+namespace BakuchiApi.Tests.UnitTests.Controllers
+    .UserControllerTests.CreateUser
 {
     internal class WhenAllIsWell
     {
@@ -15,24 +17,30 @@ namespace BakuchiApi.Tests.IntegrationTests.Controllers.UserControllerTests
         private Mock<IUserService> userServiceMock;
         private CreateUserDto newUser;
         private UserController userController;
+        private ActionResult<User> result;
 
         [SetUp]
-        public void Setup()
+        public async Task Setup()
         {
             newUser = new CreateUserDto
             {
                 Name = "Example",
-                DiscordId = 1000,
-                Email = "nothing@nothing.com"
+                DiscordId = 1000
             };
             userServiceMock = new Mock<IUserService>();
             userController = new UserController(userServiceMock.Object);
+            result = await userController.CreateUser(newUser);
         }
 
         [Test]
-        public async Task AssertCreateUserIsCalled()
+        public void AssertResponseIsNotNull()
         {
-            await userController.CreateUser(newUser);
+            Assert.IsNotNull(result);
+        }
+        
+        [Test]
+        public void AssertCreateUserIsCalled()
+        {
             userServiceMock.Verify(
                 us => us.CreateUser(It.IsAny<User>()),
                 Times.Exactly(1)

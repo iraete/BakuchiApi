@@ -64,32 +64,31 @@ namespace BakuchiApi.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateUser(Guid id, UpdateUserDto userDto)
         {
-            var user = _mapper.MapUpdateDtoToEntity(userDto);
-            
-            if (id != user.Id)
+            if (id != userDto.Id)
             {
                 return BadRequest();
             }
 
-            try 
-            {
-                var entity = await _service.RetrieveUser(id);
-                entity.Name = user.Name;
-                entity.DiscordId = user.DiscordId;
-                entity.Email = user.Email;
-                await _service.UpdateUser(entity);
-            }
-            catch (status.NotFoundException)
+            var user = _mapper.MapUpdateDtoToEntity(userDto);
+            
+            var entity = await _service.RetrieveUser(id);
+
+            if (entity == null)
             {
                 return NotFound();
+            }
+
+            entity.Name = user.Name;
+            entity.DiscordId = user.DiscordId;
+            entity.Email = user.Email;
+
+            try 
+            {
+                await _service.UpdateUser(entity);
             }
             catch (status.ConflictException)
             {
                 return Conflict();
-            }
-            catch
-            {
-                throw new Exception("Error updating user");
             }
 
             return NoContent();
@@ -100,7 +99,12 @@ namespace BakuchiApi.Controllers
         [HttpPost]
         public async Task<ActionResult<User>> CreateUser(CreateUserDto userDto)
         {
-            var user = _mapper. MapCreateDtoToEntity(userDto);
+            if (userDto.Name == null)
+            {
+                return BadRequest();
+            }
+
+            var user = _mapper.MapCreateDtoToEntity(userDto);
 
             try
             {            
@@ -110,14 +114,7 @@ namespace BakuchiApi.Controllers
             {
                 return Conflict();
             }
-            catch (NullReferenceException)
-            {
-                return BadRequest();
-            }
-            catch
-            {
-                throw new Exception("Error creating user");
-            }
+
             return CreatedAtAction("RetrieveUser", new { id = user.Id },
                  _mapper.MapEntityToDto(user));
         }
@@ -164,5 +161,6 @@ namespace BakuchiApi.Controllers
             var wagers = _service.RetrieveWagers(user);
             return wagermapper.MapEntitiesToDtos(wagers);
         }
+
     }
 }

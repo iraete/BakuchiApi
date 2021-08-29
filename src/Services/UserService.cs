@@ -64,10 +64,10 @@ namespace BakuchiApi.Services
         public async Task CreateUser(User user)
         {
             user.Id = Guid.NewGuid();
-            _context.Users.Add(user);
 
             try
             {
+                _context.Users.Add(user);
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
