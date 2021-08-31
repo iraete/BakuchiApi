@@ -58,7 +58,7 @@ namespace BakuchiApi.Tests.UnitTests.Controllers.EventControllerTests
         [Test]
         public void AssertResponseIsEventDto()
         {
-            Assert.IsInstanceOf<EventDto>(result.Result);
+            Assert.IsInstanceOf<CreatedAtActionResult>(result.Result);
         }
 
         [Test]
