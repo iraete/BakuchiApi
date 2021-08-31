@@ -92,21 +92,10 @@ namespace BakuchiApi.Controllers
                 return BadRequest();
             }
 
-            if (!_userService.DiscordIdExists(eventDto.DiscordId))
+            if (!_userService.UserExists(eventDto.UserId) ||
+                !_userService.DiscordIdExists(eventDto.DiscordId))
             {
-                try
-                {
-                    await CreateUser(eventDto);
-                }
-                catch(status.ConflictException)
-                {
-                    return Conflict("Error registering user");
-                }
-                catch(Exception)
-                {
-                    throw new Exception("Error registering user");
-                }
-
+                await CreateUser(eventDto);
             }
 
             var @event = _eventMapper.MapCreateDtoToEntity(eventDto);
