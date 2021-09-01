@@ -6,7 +6,6 @@ namespace BakuchiApi.Models
     public class Wager
     {
         public Guid UserId { get; set; }
-        public Guid DiscordId { get; set; }
         public Guid EventId { get; set; }
         public Guid PoolId { get; set; }
         public Guid OutcomeId { get; set; }

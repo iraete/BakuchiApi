@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace BakuchiApi.Models.Dtos
 {
@@ -12,8 +13,13 @@ namespace BakuchiApi.Models.Dtos
 
     public class CreateResultDto
     {
+        [Required]
         public Guid EventId { get; set; }
+
+        [Required]
         public uint OutcomeId { get; set; }
+
+        [Required]
         public uint Rank { get; set; }
     }
 

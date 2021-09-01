@@ -12,9 +12,8 @@ namespace BakuchiApi.Models.Configuration
             builder.HasOne(w => w.User)
                 .WithMany(us => us.Wagers)
                 .HasForeignKey(w => w.UserId)
-                .IsRequired()
-                .HasForeignKey(w => w.DiscordId);
-            
+                .IsRequired();
+                        
             builder.HasOne(w => w.Pool)
                 .WithMany(p => p.Wagers)
                 .HasForeignKey(w => w.PoolId)

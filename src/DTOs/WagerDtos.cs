@@ -1,12 +1,13 @@
 using System;
 using BakuchiApi.Models.Enums;
+using System.ComponentModel.DataAnnotations;
+
 
 namespace BakuchiApi.Models.Dtos
 {
     public class WagerDto
     {
         public Guid UserId { get; set; }
-        public Guid DiscordId { get; set; }
         public Guid EventId { get; set; }
         public Guid PoolId { get; set; }
         public Guid OutcomeId { get; set; }
@@ -17,10 +18,20 @@ namespace BakuchiApi.Models.Dtos
     public class CreateWagerDto
     {
         public Guid UserId { get; set; }
-        public Guid DiscordId { get; set; }
+
+        public string Name { get; set; }
+        public long? DiscordId { get; set; }
+
+        [Required]
         public Guid EventId { get; set; }
+
+        [Required]
         public Guid PoolId { get; set; }
+
+        [Required]
         public Guid OutcomeId { get; set; }
+
+        [Required]
         public double Amount { get; set; }
     }
 
@@ -35,7 +46,6 @@ namespace BakuchiApi.Models.Dtos
             return new WagerDto
             {
                 UserId = w.UserId,
-                DiscordId = w.DiscordId,
                 EventId = w.EventId,
                 PoolId = w.PoolId,
                 OutcomeId = w.OutcomeId,
@@ -49,7 +59,6 @@ namespace BakuchiApi.Models.Dtos
             return new Wager
             {
                 UserId = dto.UserId,
-                DiscordId = dto.DiscordId,
                 EventId = dto.EventId,
                 PoolId = dto.PoolId,
                 OutcomeId = dto.OutcomeId,
@@ -63,7 +72,6 @@ namespace BakuchiApi.Models.Dtos
             return new Wager
             {
                 UserId = dto.UserId,
-                DiscordId = dto.DiscordId,
                 EventId = dto.EventId,
                 PoolId = dto.PoolId,
                 OutcomeId = dto.OutcomeId,
