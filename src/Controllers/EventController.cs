@@ -108,10 +108,6 @@ namespace BakuchiApi.Controllers
             {
                 return Conflict();
             }
-            catch (DbUpdateException)
-            {
-                throw new Exception("Error adding event.");
-            }
 
             return CreatedAtAction("RetrieveEvent", new { id = @event.Id }, 
                 _eventMapper.MapEntityToDto(@event));
