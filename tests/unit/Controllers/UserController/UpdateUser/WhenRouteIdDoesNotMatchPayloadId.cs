@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using BakuchiApi.Services.Interfaces;
+using BakuchiApi.StatusExceptions;
 using BakuchiApi.Models;
 using BakuchiApi.Models.Dtos;
 using BakuchiApi.Controllers;
@@ -17,10 +18,9 @@ namespace BakuchiApi.Tests.UnitTests.Controllers.UserControllerTests
         private Mock<IUserService> userServiceMock;
         private UpdateUserDto updatedUser;
         private UserController userController;
-        private IActionResult result;
 
         [SetUp]
-        public async Task Setup()
+        public void Setup()
         {
             updatedUser = new UpdateUserDto
             {
@@ -36,24 +36,33 @@ namespace BakuchiApi.Tests.UnitTests.Controllers.UserControllerTests
                 .ReturnsAsync(new User());
             
             userController = new UserController(userServiceMock.Object);
-            result = await userController.UpdateUser(id, updatedUser);
         }
 
         [Test]
-        public void AssertResponseIsNotNull()
+        public void AssertControllerThrowsException()
         {
-            Assert.IsNotNull(result);
+            Assert.That(
+                async () => await userController.UpdateUser(id, updatedUser),
+                Throws.Exception);
         }
 
         [Test]
-        public void AssertBadRequestIsReturned()
+        public void AssertBadRequestExceptionIsThrown()
         {
-            Assert.IsInstanceOf<BadRequestResult>(result);
+            Assert.That(
+                async () => await userController.UpdateUser(id, updatedUser),
+                Throws.InstanceOf<BadRequestException>()
+            );
         }
         
         [Test]
         public void AssertUpdateUserIsNotCalled()
         {
+            Assert.That(
+                async () => await userController.UpdateUser(id, updatedUser),
+                Throws.Exception
+            );
+
             userServiceMock.Verify(
                 us => us.UpdateUser(It.IsAny<User>()),
                 Times.Exactly(0)

@@ -51,10 +51,9 @@ namespace BakuchiApi.Models.Dtos
         [StringLength(200)]
         public string Description { get; set; }
 
-        [Required]
         public DateTime Start { get; set; }
 
-        [Required, DateIsNotMoreThanOneYearLater]
+        [DateIsNotMoreThanOneYearLater]
         public DateTime End { get; set; }
     }
 

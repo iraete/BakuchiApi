@@ -20,7 +20,7 @@ namespace BakuchiApi.Tests.UnitTests.Controllers
         private ActionResult<User> result;
 
         [SetUp]
-        public async Task Setup()
+        public void Setup()
         {
             newUser = new CreateUserDto
             {
@@ -29,18 +29,42 @@ namespace BakuchiApi.Tests.UnitTests.Controllers
             };
             userServiceMock = new Mock<IUserService>();
             userController = new UserController(userServiceMock.Object);
-            result = await userController.CreateUser(newUser);
+        }
+
+        [Test]
+        public void AssertControllerDoesNotThrowException()
+        {
+            Assert.That(
+                async () => await userController.CreateUser(newUser),
+                Throws.Nothing);
         }
 
         [Test]
         public void AssertResponseIsNotNull()
         {
-            Assert.IsNotNull(result);
+            Assert.That(
+                async () => await userController.CreateUser(newUser),
+                Is.Not.EqualTo(null)
+            );
+        }
+
+        [Test]
+        public void AssertUserIsReturned()
+        {
+            Assert.That(
+                async () => await userController.CreateUser(newUser),
+                Is.InstanceOf<ActionResult<User>>()
+            );
         }
         
         [Test]
         public void AssertCreateUserIsCalled()
         {
+            Assert.That(
+                async () => await userController.CreateUser(newUser),
+                Throws.Nothing
+            );
+
             userServiceMock.Verify(
                 us => us.CreateUser(It.IsAny<User>()),
                 Times.Exactly(1)

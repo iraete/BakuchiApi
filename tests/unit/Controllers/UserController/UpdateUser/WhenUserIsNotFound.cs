@@ -4,6 +4,7 @@ using BakuchiApi.Services.Interfaces;
 using BakuchiApi.Models;
 using BakuchiApi.Models.Dtos;
 using BakuchiApi.Controllers;
+using BakuchiApi.StatusExceptions;
 using Microsoft.AspNetCore.Mvc;
 using NUnit.Framework;
 using Moq;
@@ -20,7 +21,7 @@ namespace BakuchiApi.Tests.UnitTests.Controllers.UserControllerTests
         private IActionResult result;
 
         [SetUp]
-        public async Task Setup()
+        public void Setup()
         {
             updatedUser = new UpdateUserDto
             {
@@ -36,21 +37,25 @@ namespace BakuchiApi.Tests.UnitTests.Controllers.UserControllerTests
                 .ReturnsAsync((User) null);
             
             userController = new UserController(userServiceMock.Object);
-            result = await userController.UpdateUser(id, updatedUser);
         }
 
         [Test]
-        public void AssertResponseIsNotNull()
+        public void AssertControllerThrowsException()
         {
-            Assert.IsNotNull(result);
+            Assert.That(
+                async () => await userController.UpdateUser(id, updatedUser),
+                Throws.Exception);
         }
 
         [Test]
-        public void AssertNotFoundIsReturned()
+        public void AssertNotFoundExceptionIsThrown()
         {
-            Assert.IsInstanceOf<NotFoundResult>(result);
+            Assert.That(
+                async () => await userController.UpdateUser(id, updatedUser),
+                Throws.InstanceOf<NotFoundException>()
+            );
         }
-        
+
         [Test]
         public void AssertUpdateUserIsNotCalled()
         {

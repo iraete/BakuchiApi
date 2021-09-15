@@ -1,6 +1,7 @@
 using System;
 using BakuchiApi.Services.Interfaces;
 using BakuchiApi.Services;
+using BakuchiApi.StatusExceptions;
 using BakuchiApi.Models;
 using NUnit.Framework;
 using Moq;
@@ -26,12 +27,12 @@ namespace BakuchiApi.Tests.UnitTests.Services.EconomyServiceTests
 
             toUser.Balance = fromUser.Balance = 500;
 
-            var new_obj = _economyService.TransferFundsBetweenUsers(
+            _economyService.TransferFundsBetweenUsers(
                 toUser, fromUser, 500);
             
             var cond = (fromUser.Balance == 0) &&( toUser.Balance == 1000);
 
-            Assert.IsTrue(cond);
+            Assert.That(cond, Is.True);
         }
 
         [Test]
@@ -42,10 +43,10 @@ namespace BakuchiApi.Tests.UnitTests.Services.EconomyServiceTests
 
             fromUser.Balance = 500;
 
-            Assert.Throws<NullReferenceException>(
+            Assert.That(
                 () => _economyService.TransferFundsBetweenUsers(
-                    null, fromUser, 500
-                )
+                    null, fromUser, 500),
+                Throws.InstanceOf<BadRequestException>()
             );
         }
 

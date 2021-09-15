@@ -28,7 +28,7 @@ namespace BakuchiApi.Tests.UnitTests.Services.EconomyServiceTests
 
             var cond = _economyService.IsEligibleToGetDailyReward(
                 userObj.LastRewardTime);
-            Assert.IsFalse(cond);
+            Assert.That(cond, Is.False);
         }
 
         [Test]
@@ -42,7 +42,7 @@ namespace BakuchiApi.Tests.UnitTests.Services.EconomyServiceTests
 
             var cond = _economyService.IsEligibleToGetDailyReward(
                 userObj.LastRewardTime);
-            Assert.IsTrue(cond);
+            Assert.That(cond, Is.True);
         }
 
     }

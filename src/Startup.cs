@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
+using BakuchiApi.Middleware;
 using BakuchiApi.Services;
 using BakuchiApi.Services.Interfaces;
 
@@ -31,23 +32,7 @@ namespace BakuchiApi
 
             if (runEnvironment.IsDevelopment())
             {
-                var builder = new SqlConnectionStringBuilder();
-
-                var server = Configuration["Development:Database:Server"];
-                var password = Configuration["Development:Database:Password"];
-                var port = Configuration["Development:Database:Port"];
-                var user = Configuration["Development:Database:UserID"];
-                var database = 
-                    Configuration["Development:Database:InitialCatalog"];
-
-                var connectionString = ConnectionString(
-                    server,
-                    user,
-                    database,
-                    port,
-                    password
-                );
-
+                var connectionString = GetConnectionString();
                 services.AddDbContext<BakuchiContext>(options =>
                     options.UseNpgsql(connectionString));
             }
@@ -72,25 +57,33 @@ namespace BakuchiApi
         {
 
             app.UseRouting();
-
             app.UseAuthorization();
 
+            app.UseExceptionHandler(
+                errorApp => errorApp.UseCustomExceptionHandler());
+                
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
             });
+
         }
 
-        private string ConnectionString(string host, string user, 
-            string database, 
-            string port,
-            string password)
+        private string GetConnectionString()
         {
+            var builder = new SqlConnectionStringBuilder();
+            var server = Configuration["Development:Database:Server"];
+            var password = Configuration["Development:Database:Password"];
+            var port = Configuration["Development:Database:Port"];
+            var user = Configuration["Development:Database:UserID"];
+            var database = 
+                Configuration["Development:Database:InitialCatalog"];
+
             return
                 String.Format(
                     "Server={0};Username={1};Database={2};Port={3};" +
                     "Password={4};SSLMode=Prefer",
-                    host,
+                    server,
                     user,
                     database,
                     port,

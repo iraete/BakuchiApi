@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using BakuchiApi.Models;
-using status = BakuchiApi.StatusExceptions;
+using BakuchiApi.StatusExceptions;
 using BakuchiApi.Services.Interfaces;
 
 namespace BakuchiApi.Services
@@ -46,12 +46,12 @@ namespace BakuchiApi.Services
             {
                 if (!UserExists(user.Id))
                 {
-                    throw new status.NotFoundException();
+                    throw new NotFoundException();
                 }
                 else if (user.DiscordId != null 
                     && !DiscordIdExists(user.DiscordId))
                 {
-                    throw new status.ConflictException();
+                    throw new ConflictException();
                 }
                 else
                 {
@@ -75,7 +75,8 @@ namespace BakuchiApi.Services
                 if (user.DiscordId != null 
                     && !DiscordIdExists(user.DiscordId))
                 {
-                    throw new status.ConflictException();
+                    throw new ConflictException("A user with the provided "
+                        + "Discord ID already exists.");
                 }
                 else
                 {

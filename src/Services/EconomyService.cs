@@ -13,26 +13,31 @@ namespace BakuchiApi.Services
         {
             if (amount < 0)
             {
-                throw new InvalidFundsException();
+                throw new BadRequestException("Negative amount supplied");
             }
+
             return (userFunds - amount >= 0);
         }
 
-        public User AddFunds(User toUser, double amount)
+        public void AddFunds(User toUser, double amount)
         {
             toUser.Balance = toUser.Balance + amount;
-            return toUser;
         }
 
-        public User DeductFunds(User fromUser, double amount)
+        public void DeductFunds(User fromUser, double amount)
         {
             fromUser.Balance = fromUser.Balance - amount;
-            return fromUser;
         }
 
-        public List<User> TransferFundsBetweenUsers(User toUser, User fromUser,
+        public void TransferFundsBetweenUsers(User toUser, User fromUser,
              double amount)
         {
+            if (toUser == null || fromUser == null)
+            {
+                throw new BadRequestException("One or more supplied "
+                    + "users is null");
+            }
+
             if (IsEnoughFunds(fromUser.Balance, amount))
             {
                 fromUser.Balance = fromUser.Balance - amount;
@@ -40,10 +45,9 @@ namespace BakuchiApi.Services
             }
             else
             {
-                throw new InvalidFundsException();
+                throw new BadRequestException("User does not have "
+                    + "enough funds.");
             }
-
-            return new List<User> { toUser, fromUser };
         }
 
         public bool IsEligibleToGetDailyReward(DateTime lastRewardTime)
@@ -51,37 +55,43 @@ namespace BakuchiApi.Services
             return lastRewardTime.AddHours(24) <= DateTime.Now;
         }
 
-        public User GetDailyReward(User userDto)
+        public void GetDailyReward(User user)
         {
+            if (user == null)
+            {
+                throw new BadRequestException("Supplied user is null");
+            }
+
             Random random = new Random();
             double dailyReward = random.Next(1000);
-            userDto.Balance += dailyReward;
-            userDto.LastRewardTime = DateTime.Now;
-            return userDto;
+            user.Balance += dailyReward;
+            user.LastRewardTime = DateTime.Now;
         }
 
         public List<User> DistributePoolFunds(Pool pool, Guid winningOutcomeId)
         {
             if (pool == null || pool.Wagers == null)
             {
-                throw new NullReferenceException();
+                throw new 
+                    BadRequestException(
+                        "Pool not supplied or pool has no wagers");
             }
 
             var wagers = pool.Wagers.Where
                 (w => w.OutcomeId == winningOutcomeId);
 
-            if (wagers.Count() <= 0)
-            {
-                throw new DivideByZeroException();
-            }
-
-            var payout = pool.TotalWagers / wagers.Sum(w => w.Amount);
             var updatedUsers = new List<User>();
 
-            foreach (var w in wagers)
+            if (wagers.Count() > 0)
             {
-                var funds = Math.Ceiling(payout * w.Amount);
-                updatedUsers.Add(AddFunds(w.User, funds));
+                var payout = pool.TotalWagers / wagers.Sum(w => w.Amount);
+
+                foreach (var w in wagers)
+                {
+                    var funds = Math.Ceiling(payout * w.Amount);
+                    AddFunds(w.User, funds);
+                    updatedUsers.Add(w.User);
+                }
             }
 
             return updatedUsers;

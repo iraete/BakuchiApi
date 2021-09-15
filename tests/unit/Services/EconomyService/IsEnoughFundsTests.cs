@@ -1,5 +1,6 @@
 using BakuchiApi.Services.Interfaces;
 using BakuchiApi.Services;
+using BakuchiApi.StatusExceptions;
 using BakuchiApi.Models;
 using NUnit.Framework;
 using Moq;
@@ -25,7 +26,21 @@ namespace BakuchiApi.Tests.UnitTests.Services.EconomyServiceTests
             };
             var cond = _economyService.IsEnoughFunds(userObj.Balance,
                  userObj.Balance + 1);
-            Assert.IsFalse(cond);
+            Assert.That(cond, Is.False);
+        }
+
+        [Test]
+        public void WhenAmountIsNegative()
+        {
+            User userObj = new User {
+                Id = System.Guid.NewGuid(),
+                Balance = 1000
+            };
+
+            Assert.That(
+                () => _economyService.IsEnoughFunds(userObj.Balance, -999),
+                Throws.InstanceOf<BadRequestException>()
+            );
         }
 
         [Test]
@@ -38,7 +53,7 @@ namespace BakuchiApi.Tests.UnitTests.Services.EconomyServiceTests
 
             var cond = _economyService.IsEnoughFunds(userObj.Balance,
                  userObj.Balance - 1);
-            Assert.IsTrue(cond);
+            Assert.That(cond, Is.True);
         }
 
     }

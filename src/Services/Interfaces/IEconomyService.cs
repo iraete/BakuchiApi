@@ -9,10 +9,10 @@ namespace BakuchiApi.Services.Interfaces
     {
         bool IsEnoughFunds(double userFunds, double amount);
         bool IsEligibleToGetDailyReward(DateTime lastRewardTime);
-        List<User> TransferFundsBetweenUsers(User toUser, User fromUser, double amount);
-        User AddFunds(User toUser, double amount);
-        User DeductFunds(User fromUser, double amount);
+        void TransferFundsBetweenUsers(User toUser, User fromUser, double amount);
+        void AddFunds(User toUser, double amount);
+        void DeductFunds(User fromUser, double amount);
         List<User> DistributePoolFunds(Pool pool, Guid winningOutcomeId);
-        User GetDailyReward(User user);
+        void GetDailyReward(User user);
     }
 }

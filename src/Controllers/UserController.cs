@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using BakuchiApi.Models;
 using BakuchiApi.Models.Dtos;
 using BakuchiApi.Services.Interfaces;
-using status = BakuchiApi.StatusExceptions;
+using BakuchiApi.StatusExceptions;
 
 namespace BakuchiApi.Controllers
 {
@@ -35,12 +35,7 @@ namespace BakuchiApi.Controllers
         public async Task<ActionResult<UserDto>> RetrieveUser(Guid id)
         {
             var user = await _service.RetrieveUser(id);
-
-            if (user == null)
-            {
-                return NotFound();
-            }
-
+            CheckIfUserExists(user);
             return _mapper.MapEntityToDto(user);
         }
 
@@ -50,12 +45,7 @@ namespace BakuchiApi.Controllers
             RetrieveUserByDiscordId(long discordId)
         {
             var user = await _service.RetrieveUserByDiscordId(discordId);
-
-            if (user == null)
-            {
-                return NotFound();
-            }
-
+            CheckIfUserExists(user);
             return _mapper.MapEntityToDto(user);
         }
 
@@ -66,30 +56,19 @@ namespace BakuchiApi.Controllers
         {
             if (id != userDto.Id)
             {
-                return BadRequest();
+                throw new BadRequestException();
             }
 
             var user = _mapper.MapUpdateDtoToEntity(userDto);
-            
             var entity = await _service.RetrieveUser(id);
 
-            if (entity == null)
-            {
-                return NotFound();
-            }
+            CheckIfUserExists(entity);
 
             entity.Name = user.Name;
             entity.DiscordId = user.DiscordId;
             entity.Email = user.Email;
 
-            try 
-            {
-                await _service.UpdateUser(entity);
-            }
-            catch (status.ConflictException)
-            {
-                return Conflict();
-            }
+            await _service.UpdateUser(entity);
 
             return NoContent();
         }
@@ -99,22 +78,8 @@ namespace BakuchiApi.Controllers
         [HttpPost]
         public async Task<ActionResult<User>> CreateUser(CreateUserDto userDto)
         {
-            if (userDto.Name == null)
-            {
-                return BadRequest();
-            }
-
             var user = _mapper.MapCreateDtoToEntity(userDto);
-
-            try
-            {            
-                await _service.CreateUser(user);
-            }
-            catch (status.ConflictException)
-            {
-                return Conflict();
-            }
-
+            await _service.CreateUser(user);
             return CreatedAtAction("RetrieveUser", new { id = user.Id },
                  _mapper.MapEntityToDto(user));
         }
@@ -124,13 +89,8 @@ namespace BakuchiApi.Controllers
         public async Task<IActionResult> DeleteUser(Guid id)
         {
             var user = await _service.RetrieveUser(id);
-            if (user == null)
-            {
-                return NotFound();
-            }
-
+            CheckIfUserExists(user);
             await _service.DeleteUser(user);
-
             return NoContent();
         }
 
@@ -140,10 +100,7 @@ namespace BakuchiApi.Controllers
         {
             var eventmapper = new EventDtoMapper();
             var user = await _service.RetrieveUser(id);
-            if (user == null)
-            {
-                return NotFound();
-            }
+            CheckIfUserExists(user);
             var events =  _service.RetrieveEvents(user);
             return eventmapper.MapEntitiesToDtos(events);
         }
@@ -154,13 +111,17 @@ namespace BakuchiApi.Controllers
         {
             var wagermapper = new WagerDtoMapper();
             var user = await _service.RetrieveUser(id);
-            if (user == null)
-            {
-                return NotFound();
-            }
+            CheckIfUserExists(user);
             var wagers = _service.RetrieveWagers(user);
             return wagermapper.MapEntitiesToDtos(wagers);
         }
 
+        private void CheckIfUserExists(User user)
+        {
+            if (user == null)
+            {
+                throw new NotFoundException();
+            }
+        }
     }
 }

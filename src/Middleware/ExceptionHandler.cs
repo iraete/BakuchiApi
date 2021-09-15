@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
-using System.Text.Json;
+using BakuchiApi.StatusExceptions;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
@@ -24,12 +24,13 @@ namespace BakuchiApi.Middleware
                     .Get<IExceptionHandlerFeature>();
                 var response = httpContext.Response;
                 var ex = exceptionDetails?.Error;
-                var exType = ex.GetType();
 
                 response.ContentType = "application/json";
 
-                switch (exType)
+                switch (ex)
                 {
+                    case BaseServiceException:
+                        break;
                     default:
                         response.StatusCode = 
                             (int)HttpStatusCode.InternalServerError;
