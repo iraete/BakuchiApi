@@ -4,6 +4,7 @@ using BakuchiApi.Services.Interfaces;
 using BakuchiApi.Models;
 using BakuchiApi.Models.Dtos;
 using BakuchiApi.Controllers;
+using BakuchiApi.StatusExceptions;
 using Microsoft.AspNetCore.Mvc;
 using NUnit.Framework;
 using Moq;
@@ -17,11 +18,12 @@ namespace BakuchiApi.Tests.UnitTests.Controllers.EventControllerTests
         private Mock<IUserService> _userService;
         private EventController _controller;
         private ActionResult<EventDto> result;
+        private CreateEventDto newEvent;
 
         [SetUp]
-        public async Task Setup()
+        public void Setup()
         {
-            var newEvent = new CreateEventDto()
+            newEvent = new CreateEventDto()
             {
                 Name = "Example Event #1",
                 UserName = "User",
@@ -46,19 +48,23 @@ namespace BakuchiApi.Tests.UnitTests.Controllers.EventControllerTests
                 .Returns(true);
 
             _controller = new EventController(_eventService.Object, _userService.Object);
-            result = await _controller.CreateEvent(newEvent);
+        }
+
+        [Test]
+        public void AssertControllerThrowsException()
+        {
+            Assert.That(
+                async () => await _controller.CreateEvent(newEvent),
+                Throws.Exception);
         }
         
         [Test]
-        public void AssertResponseIsNotNull()
+        public void AssertBadRequestExceptionIsThrown()
         {
-            Assert.IsNotNull(result.Result);
-        }
-        
-        [Test]
-        public void AssertResponseIsBadRequest()
-        {
-            Assert.IsInstanceOf<BadRequestResult>(result.Result);
+            Assert.That(
+                async () => await _controller.CreateEvent(newEvent),
+                Throws.InstanceOf<BadRequestException>()
+            );
         }
 
         [Test]

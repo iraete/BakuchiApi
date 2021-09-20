@@ -4,6 +4,7 @@ using BakuchiApi.Services.Interfaces;
 using BakuchiApi.Models;
 using BakuchiApi.Models.Dtos;
 using BakuchiApi.Controllers;
+using BakuchiApi.StatusExceptions;
 using Microsoft.AspNetCore.Mvc;
 using NUnit.Framework;
 using Moq;
@@ -19,7 +20,7 @@ namespace BakuchiApi.Tests.UnitTests.Controllers.UserControllerTests
         private IActionResult result;
 
         [SetUp]
-        public async Task Setup()
+        public void Setup()
         {
             userServiceMock = new Mock<IUserService>();
 
@@ -28,19 +29,24 @@ namespace BakuchiApi.Tests.UnitTests.Controllers.UserControllerTests
                 .ReturnsAsync((User) null);
                 
             userController = new UserController(userServiceMock.Object);
-            result = await userController.DeleteUser(id);
         }
 
         [Test]
-        public void AssertResponseIsNotNull()
+        public void AssertControllerThrowsException()
         {
-            Assert.IsNotNull(result);
+            Assert.That(
+                async () => await userController.DeleteUser(id),
+                Throws.Exception
+            );
         }
 
         [Test]
-        public void AssertNotFoundIsReturned()
+        public void AssertNotFoundExceptionIsThrown()
         {
-            Assert.IsInstanceOf<NotFoundResult>(result);
+            Assert.That(
+                async () => await userController.DeleteUser(id),
+                Throws.InstanceOf<NotFoundException>()
+            );
         }
         
         [Test]

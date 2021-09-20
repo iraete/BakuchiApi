@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using BakuchiApi.Services.Interfaces;
+using BakuchiApi.StatusExceptions;
 using BakuchiApi.Services;
 using BakuchiApi.Models;
 using NUnit.Framework;
@@ -73,7 +74,7 @@ namespace BakuchiApi.Tests.UnitTests.Services.EconomyServiceTests
         public void WhenPoolWagersIsNull()
         {
             pool = new Pool { };
-            Assert.Throws<NullReferenceException>(
+            Assert.Throws<BadRequestException>(
                 () => _economyService.DistributePoolFunds(
                     pool, Guid.NewGuid()));
         }
@@ -86,16 +87,18 @@ namespace BakuchiApi.Tests.UnitTests.Services.EconomyServiceTests
                 Wagers = new List<Wager>()
             };
 
-            Assert.Throws<DivideByZeroException>(
+            Assert.That(
                 () => _economyService.DistributePoolFunds(
-                    pool, Guid.NewGuid()));
+                    pool, Guid.NewGuid()),
+                Is.Empty
+            );
         }
 
         [Test]
         public void WhenPoolIsNull()
         {
             pool = null;
-            Assert.Throws<NullReferenceException>(
+            Assert.Throws<BadRequestException>(
                 () => _economyService.DistributePoolFunds(
                     pool, Guid.NewGuid()));
         }

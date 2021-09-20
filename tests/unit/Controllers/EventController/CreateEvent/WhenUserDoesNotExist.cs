@@ -17,11 +17,12 @@ namespace BakuchiApi.Tests.UnitTests.Controllers.EventControllerTests
         private Mock<IUserService> _userService;
         private EventController _controller;
         private ActionResult<EventDto> result;
+        private CreateEventDto newEvent;
 
         [SetUp]
-        public async Task Setup()
+        public void Setup()
         {
-            var newEvent = new CreateEventDto()
+            newEvent = new CreateEventDto()
             {
                 Name = "Example Event #1",
                 UserName = "User",
@@ -46,24 +47,21 @@ namespace BakuchiApi.Tests.UnitTests.Controllers.EventControllerTests
                 .Returns(false);
 
             _controller = new EventController(_eventService.Object, _userService.Object);
-            result = await _controller.CreateEvent(newEvent);
         }
         
         [Test]
         public void AssertResponseIsNotNull()
         {
-            Assert.IsNotNull(result.Result);
-        }
-        
-        [Test]
-        public void AssertResponseIsEventDto()
-        {
-            Assert.IsInstanceOf<CreatedAtActionResult>(result.Result);
+            Assert.That(
+                async () =>  await _controller.CreateEvent(newEvent),
+                Is.Not.Null
+            );
         }
 
         [Test]
-        public void AssertEventServiceCreatesItem()
+        public async Task AssertEventServiceCreatesItem()
         {
+            await _controller.CreateEvent(newEvent);
             _eventService
                 .Verify(
                     _ => _.CreateEvent(It.IsAny<Event>()),
@@ -71,8 +69,9 @@ namespace BakuchiApi.Tests.UnitTests.Controllers.EventControllerTests
         }
 
         [Test]
-        public void AssertUserServiceCreatesNewUser()
+        public async Task AssertUserServiceCreatesNewUser()
         {
+            await _controller.CreateEvent(newEvent);
             _userService
                 .Verify(
                     _ => _.CreateUser(It.IsAny<User>()),

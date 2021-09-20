@@ -5,6 +5,7 @@ using BakuchiApi.Models;
 using BakuchiApi.Models.Dtos;
 using BakuchiApi.Controllers;
 using Microsoft.AspNetCore.Mvc;
+using BakuchiApi.StatusExceptions;
 using NUnit.Framework;
 using Moq;
 
@@ -17,11 +18,12 @@ namespace BakuchiApi.Tests.UnitTests.Controllers.EventControllerTests
         private Mock<IUserService> _userService;
         private EventController _controller;
         private IActionResult result;
+        private Guid eventId;
 
         [SetUp]
-        public async Task Setup()
+        public void Setup()
         {
-            var eventId = Guid.NewGuid();
+            eventId = Guid.NewGuid();
 
             _eventService = new Mock<IEventService>();
             _userService = new Mock<IUserService>();
@@ -31,19 +33,24 @@ namespace BakuchiApi.Tests.UnitTests.Controllers.EventControllerTests
                 .ReturnsAsync((Event)null);
 
             _controller = new EventController(_eventService.Object, _userService.Object);
-            result = await _controller.DeleteEvent(eventId);
         }
 
         [Test]
-        public void AssertResponseIsNotNull()
+        public void AssertControllerThrowsException()
         {
-            Assert.IsNotNull(result);
+            Assert.That(
+                async () => await _controller.DeleteEvent(eventId),
+                Throws.Exception
+            );
         }
 
         [Test]
         public void AssertNotFoundIsReturned()
         {
-            Assert.IsInstanceOf<NotFoundResult>(result);
+            Assert.That(
+                async () => await _controller.DeleteEvent(eventId),
+                Throws.InstanceOf<NotFoundException>()
+            );
         }
         
         [Test]

@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BakuchiApi.Models.Dtos;
 using BakuchiApi.Services.Interfaces;
-using status = BakuchiApi.StatusExceptions;
+using BakuchiApi.StatusExceptions;
 
 namespace BakuchiApi.Controllers
 {
@@ -57,26 +57,22 @@ namespace BakuchiApi.Controllers
             if (id != eventDto.Id 
                 || !ValidateDates(eventDto.Start, eventDto.End))
             {
-                return BadRequest();
+                throw new BadRequestException();
             }
 
             var @event = _eventMapper.MapUpdateDtoToEntity(eventDto);
-            try
+
+            var entity = await _eventService.RetrieveEvent(id);
+
+            if (entity == null)
             {
-                var entity = await _eventService.RetrieveEvent(id);
-                entity.Description = @event.Description;
-                entity.Start = @event.Start;
-                entity.End = @event.End;
-                await _eventService.UpdateEvent(entity);
+                throw new NotFoundException();
             }
-            catch (status.NotFoundException)
-            {
-                return NotFound();
-            }
-            catch
-            {
-                throw new Exception("Error updating event");
-            }
+            
+            entity.Description = @event.Description;
+            entity.Start = @event.Start;
+            entity.End = @event.End;
+            await _eventService.UpdateEvent(entity);
 
             return NoContent();
         }
@@ -89,7 +85,7 @@ namespace BakuchiApi.Controllers
         {
             if (!ValidateDates(eventDto.Start, eventDto.End))
             {
-                return BadRequest();
+                throw new BadRequestException();
             }
 
             if (!_userService.UserExists(eventDto.UserId) ||
@@ -99,15 +95,7 @@ namespace BakuchiApi.Controllers
             }
 
             var @event = _eventMapper.MapCreateDtoToEntity(eventDto);
-            
-            try
-            {
-                await _eventService.CreateEvent(@event);
-            }
-            catch (status.ConflictException)
-            {
-                return Conflict();
-            }
+            await _eventService.CreateEvent(@event);
 
             return CreatedAtAction("RetrieveEvent", new { id = @event.Id }, 
                 _eventMapper.MapEntityToDto(@event));
@@ -121,7 +109,7 @@ namespace BakuchiApi.Controllers
 
             if (@event == null)
             {
-                return NotFound();
+                throw new NotFoundException();
             }
 
             await _eventService.DeleteEvent(@event);

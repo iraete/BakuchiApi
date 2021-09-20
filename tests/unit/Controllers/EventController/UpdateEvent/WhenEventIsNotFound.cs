@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using BakuchiApi.Services.Interfaces;
+using BakuchiApi.StatusExceptions;
 using BakuchiApi.Models;
 using BakuchiApi.Models.Dtos;
 using BakuchiApi.Controllers;
@@ -17,11 +18,12 @@ namespace BakuchiApi.Tests.UnitTests.Controllers.EventControllerTests
         private Mock<IUserService> _userService;
         private EventController _controller;
         private IActionResult result;
+        private UpdateEventDto updateEvent;
 
         [SetUp]
-        public async Task Setup()
+        public void Setup()
         {
-            var updateEvent = new UpdateEventDto()
+            updateEvent = new UpdateEventDto()
             {
                 Id = Guid.NewGuid(),
                 Description = "A sample description",
@@ -37,19 +39,24 @@ namespace BakuchiApi.Tests.UnitTests.Controllers.EventControllerTests
                 .ReturnsAsync((Event) null);
 
             _controller = new EventController(_eventService.Object, _userService.Object);
-            result = await _controller.UpdateEvent(updateEvent.Id, updateEvent);
         }
         
         [Test]
-        public void AssertResponseIsNull()
+        public void AssertControllerThrowsException()
         {
-            Assert.IsNull(result);
+            Assert.That(
+                async () => await _controller.UpdateEvent(updateEvent.Id, updateEvent),
+                Throws.Exception
+            );
         }
         
         [Test]
-        public void AssertNoContentIsReturned()
+        public void AssertNotFoundExceptionIsThrown()
         {
-            Assert.IsInstanceOf<NoContentResult>(result);
+            Assert.That(
+                async () => await _controller.UpdateEvent(updateEvent.Id, updateEvent),
+                Throws.InstanceOf<NotFoundException>()
+            );
         }
 
         [Test]
@@ -58,7 +65,7 @@ namespace BakuchiApi.Tests.UnitTests.Controllers.EventControllerTests
             _eventService
                 .Verify(
                     _ => _.UpdateEvent(It.IsAny<Event>()),
-                    Times.Exactly(1));
+                    Times.Exactly(0));
         }
     }
 }
