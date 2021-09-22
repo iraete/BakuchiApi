@@ -58,13 +58,9 @@ namespace BakuchiApi.Tests.UnitTests.Controllers
         }
         
         [Test]
-        public void AssertCreateUserIsCalled()
+        public async Task AssertCreateUserIsCalled()
         {
-            Assert.That(
-                async () => await userController.CreateUser(newUser),
-                Throws.Nothing
-            );
-
+            await userController.CreateUser(newUser);
             userServiceMock.Verify(
                 us => us.CreateUser(It.IsAny<User>()),
                 Times.Exactly(1)

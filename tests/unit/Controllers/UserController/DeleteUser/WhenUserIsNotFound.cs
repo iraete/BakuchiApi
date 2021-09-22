@@ -50,12 +50,19 @@ namespace BakuchiApi.Tests.UnitTests.Controllers.UserControllerTests
         }
         
         [Test]
-        public void AssertDeleteUserIsCalled()
+        public async Task AssertDeleteUserIsCalled()
         {
-            userServiceMock.Verify(
-                us => us.DeleteUser(It.IsAny<User>()),
-                Times.Exactly(0)
-            );
+            try
+            {
+                await userController.DeleteUser(id);
+            }
+            catch
+            {
+                userServiceMock.Verify(
+                    us => us.DeleteUser(It.IsAny<User>()),
+                    Times.Exactly(0)
+                );
+            }
         }
     }
 }

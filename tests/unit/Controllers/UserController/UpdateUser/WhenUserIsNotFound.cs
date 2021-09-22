@@ -57,12 +57,18 @@ namespace BakuchiApi.Tests.UnitTests.Controllers.UserControllerTests
         }
 
         [Test]
-        public void AssertUpdateUserIsNotCalled()
+        public async Task AssertUpdateUserIsNotCalled()
         {
-            userServiceMock.Verify(
-                us => us.UpdateUser(It.IsAny<User>()),
-                Times.Exactly(0)
-            );
+            try
+            {
+                await userController.UpdateUser(id, updatedUser);
+            }
+            catch
+            {    userServiceMock.Verify(
+                    us => us.UpdateUser(It.IsAny<User>()),
+                    Times.Exactly(0)
+                );
+            }
         }
     }
 }

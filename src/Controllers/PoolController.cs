@@ -88,16 +88,9 @@ namespace BakuchiApi.Controllers
         // POST: api/Pool
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Pool>> CreatePool(
-            Guid eventId, CreatePoolDto poolDto)
+        public async Task<ActionResult<Pool>> CreatePool(CreatePoolDto poolDto)
         {
-            if (eventId != poolDto.EventId)
-            {
-                return BadRequest();
-            }
-
             var pool = _poolMapper.MapCreateDtoToEntity(poolDto);
-
             await _service.CreatePool(pool);
             return CreatedAtAction("RetrievePool", new { id = pool.Id },
                 _poolMapper.MapEntityToDto(pool));

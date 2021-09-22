@@ -68,21 +68,35 @@ namespace BakuchiApi.Tests.UnitTests.Controllers.EventControllerTests
         }
 
         [Test]
-        public void AssertEventServiceDoesNotCreateItem()
+        public async Task AssertEventServiceDoesNotCreateItem()
         {
-            _eventService
-                .Verify(
-                    _ => _.CreateEvent(It.IsAny<Event>()),
-                    Times.Exactly(0));
+            try
+            {
+                await _controller.CreateEvent(newEvent); 
+            }
+            catch
+            {
+                _eventService
+                    .Verify(
+                        _ => _.CreateEvent(It.IsAny<Event>()),
+                        Times.Exactly(0));
+            }
         }
 
         [Test]
-        public void AssertUserServiceDoesNotCreateNewUser()
+        public async Task AssertUserServiceDoesNotCreateNewUser()
         {
-            _userService
-                .Verify(
-                    _ => _.CreateUser(It.IsAny<User>()),
-                    Times.Exactly(0));
+            try
+            {
+                await _controller.CreateEvent(newEvent); 
+            }
+            catch
+            {
+                _eventService
+                    .Verify(
+                        _ => _.CreateEvent(It.IsAny<Event>()),
+                        Times.Exactly(0));
+            }
         }
     }
 }

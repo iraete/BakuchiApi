@@ -20,7 +20,7 @@ namespace BakuchiApi.Tests.UnitTests.Controllers.EventControllerTests
         private CreateEventDto newEvent;
 
         [SetUp]
-        public async Task Setup()
+        public void Setup()
         {
             newEvent = new CreateEventDto()
             {
@@ -47,7 +47,6 @@ namespace BakuchiApi.Tests.UnitTests.Controllers.EventControllerTests
                 .Returns(true);
 
             _controller = new EventController(_eventService.Object, _userService.Object);
-            result = await _controller.CreateEvent(newEvent);
         }
         
         [Test]
@@ -69,8 +68,9 @@ namespace BakuchiApi.Tests.UnitTests.Controllers.EventControllerTests
         }
 
         [Test]
-        public void AssertEventServiceCreatesItem()
+        public async Task AssertEventServiceCreatesItem()
         {
+            await _controller.CreateEvent(newEvent);
             _eventService
                 .Verify(
                     _ => _.CreateEvent(It.IsAny<Event>()),
@@ -78,8 +78,9 @@ namespace BakuchiApi.Tests.UnitTests.Controllers.EventControllerTests
         }
 
         [Test]
-        public void AssertUserServiceDoesNotCreateNewUser()
+        public async Task AssertUserServiceDoesNotCreateNewUser()
         {
+            await _controller.CreateEvent(newEvent);
             _userService
                 .Verify(
                     _ => _.CreateUser(It.IsAny<User>()),
