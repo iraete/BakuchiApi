@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using BakuchiApi.Models;
-using BakuchiApi.Models.Dtos;
+using BakuchiApi.Controllers.Dtos;
 using BakuchiApi.Services.Interfaces;
 using status = BakuchiApi.StatusExceptions;
 

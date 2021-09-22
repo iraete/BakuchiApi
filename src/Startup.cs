@@ -10,7 +10,8 @@ using Microsoft.EntityFrameworkCore;
 using BakuchiApi.Middleware;
 using BakuchiApi.Services;
 using BakuchiApi.Services.Interfaces;
-
+using FluentValidation.AspNetCore;
+using FluentValidation;
 
 namespace BakuchiApi
 {
@@ -49,7 +50,11 @@ namespace BakuchiApi
             services.AddScoped<IEconomyService, EconomyService>();
 
             // Add controllers
-            services.AddControllers().AddNewtonsoftJson();
+            services.AddControllers()
+                .AddFluentValidation(
+                    fv => 
+                        fv.RegisterValidatorsFromAssemblyContaining<Startup>())
+                .AddNewtonsoftJson();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

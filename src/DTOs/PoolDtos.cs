@@ -1,8 +1,9 @@
 using System;
 using BakuchiApi.Models.Enums;
+using BakuchiApi.Models;
 using System.ComponentModel.DataAnnotations;
 
-namespace BakuchiApi.Models.Dtos
+namespace BakuchiApi.Controllers.Dtos
 {
     public class PoolDto : BaseIdDto
     {
@@ -15,31 +16,17 @@ namespace BakuchiApi.Models.Dtos
 
     public class CreatePoolDto
     {
-        [Required]
         public Guid EventId { get; set; }
-
-        [Required]
         public string Alias { get; set; }
-
-        [Required]
         public BetType BetType { get; set; }
-        
-        [StringLength(200)]
         public string Description { get; set; }
     }
 
     public class UpdatePoolDto
     {
-        [Required]
         public Guid Id { get; set; }
-
-        [Required]
         public string Alias { get; set; }
-
-        [Required]
         public BetType BetType { get; set; }
-
-        [StringLength(200)]
         public string Description { get; set; }
     }
 

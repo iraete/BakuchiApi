@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BakuchiApi.Models;
-using BakuchiApi.Models.Dtos;
+using BakuchiApi.Controllers.Dtos;
 using BakuchiApi.Services.Interfaces;
 
 namespace BakuchiApi.Controllers

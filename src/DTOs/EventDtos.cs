@@ -1,8 +1,9 @@
 using System;
 using System.ComponentModel.DataAnnotations;
-using BakuchiApi.Models.Dtos.Validators;
+using BakuchiApi.Models;
+using BakuchiApi.Controllers.Dtos.Validators;
 
-namespace BakuchiApi.Models.Dtos
+namespace BakuchiApi.Controllers.Dtos
 {
     public class EventDto : BaseIdDto
     {
@@ -18,42 +19,22 @@ namespace BakuchiApi.Models.Dtos
 
     public class CreateEventDto
     {
-        [Required]
         public string Name { get; set; }
-
-        [Required]
         public string UserName { get; set; }
-
-        [Required]
         public string Alias { get; set; }
-
-        [Required]
         public Guid UserId { get; set; }
-
         public long? DiscordId { get; set; }
         public long? ServerId { get; set; }
-
-        [StringLength(200)]
         public string Description { get; set; }
-
-        [Required, DateIsNotMoreThanOneYearLater]
         public DateTime Start { get; set; }
-
-        [Required, DateIsNotMoreThanOneYearLater]
         public DateTime End { get; set; }
     }
 
     public class UpdateEventDto
     {
-        [Required]
         public Guid Id { get; set; }
-
-        [StringLength(200)]
         public string Description { get; set; }
-
         public DateTime Start { get; set; }
-
-        [DateIsNotMoreThanOneYearLater]
         public DateTime End { get; set; }
     }
 

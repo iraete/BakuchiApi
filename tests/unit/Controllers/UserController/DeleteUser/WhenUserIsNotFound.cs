@@ -2,7 +2,7 @@ using System;
 using System.Threading.Tasks;
 using BakuchiApi.Services.Interfaces;
 using BakuchiApi.Models;
-using BakuchiApi.Models.Dtos;
+using BakuchiApi.Controllers.Dtos;
 using BakuchiApi.Controllers;
 using BakuchiApi.StatusExceptions;
 using Microsoft.AspNetCore.Mvc;

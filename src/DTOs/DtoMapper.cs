@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace BakuchiApi.Models.Dtos
+namespace BakuchiApi.Controllers.Dtos
 {
     public abstract class DtoMapper<TSource, TEntityDto, 
         TUpdateEntityDto, TCreateEntityDto>

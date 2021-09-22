@@ -1,6 +1,6 @@
 using System;
 
-namespace BakuchiApi.Models.Dtos
+namespace BakuchiApi.Controllers.Dtos
 {
     public class BaseIdDto
     {

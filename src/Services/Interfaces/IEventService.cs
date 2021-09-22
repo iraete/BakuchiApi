@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using BakuchiApi.Models;
-using BakuchiApi.Models.Dtos;
+using BakuchiApi.Controllers.Dtos;
 
 namespace BakuchiApi.Services.Interfaces
 {

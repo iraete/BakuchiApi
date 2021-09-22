@@ -1,7 +1,8 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using BakuchiApi.Models;
 
-namespace BakuchiApi.Models.Dtos
+namespace BakuchiApi.Controllers.Dtos
 {
     public class UserDto : BaseIdDto
     {
@@ -13,14 +14,12 @@ namespace BakuchiApi.Models.Dtos
 
     public class UpdateUserDto : BaseIdDto
     {
-        [Required]
         public string Name { get; set; }
         public long? DiscordId { get; set; }
     }
 
     public class CreateUserDto
     {
-        [Required]
         public string Name { get; set; }
         public long? DiscordId { get; set; }
     }
