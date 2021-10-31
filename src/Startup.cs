@@ -1,22 +1,20 @@
-using System;
 using System.Data.SqlClient;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Microsoft.EntityFrameworkCore;
 using BakuchiApi.Middleware;
 using BakuchiApi.Services;
 using BakuchiApi.Services.Interfaces;
 using FluentValidation.AspNetCore;
-using FluentValidation;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace BakuchiApi
 {
     public class Startup
     {
+        private readonly IWebHostEnvironment runEnvironment;
 
         public Startup(IConfiguration configuration, IWebHostEnvironment env)
         {
@@ -25,12 +23,10 @@ namespace BakuchiApi
         }
 
         public IConfiguration Configuration { get; }
-        private readonly IWebHostEnvironment runEnvironment;
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
             if (runEnvironment.IsDevelopment())
             {
                 var connectionString = GetConnectionString();
@@ -52,7 +48,7 @@ namespace BakuchiApi
             // Add controllers
             services.AddControllers()
                 .AddFluentValidation(
-                    fv => 
+                    fv =>
                         fv.RegisterValidatorsFromAssemblyContaining<Startup>())
                 .AddNewtonsoftJson();
         }
@@ -60,18 +56,13 @@ namespace BakuchiApi
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-
             app.UseRouting();
             app.UseAuthorization();
 
             app.UseExceptionHandler(
                 errorApp => errorApp.UseCustomExceptionHandler());
-                
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-            });
 
+            app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
         }
 
         private string GetConnectionString()
@@ -81,11 +72,11 @@ namespace BakuchiApi
             var password = Configuration["Development:Database:Password"];
             var port = Configuration["Development:Database:Port"];
             var user = Configuration["Development:Database:UserID"];
-            var database = 
+            var database =
                 Configuration["Development:Database:InitialCatalog"];
 
             return
-                String.Format(
+                string.Format(
                     "Server={0};Username={1};Database={2};Port={3};" +
                     "Password={4};SSLMode=Prefer",
                     server,

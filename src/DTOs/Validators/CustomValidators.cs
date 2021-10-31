@@ -1,14 +1,13 @@
-using FluentValidation;
 using System;
-using System.Collections.Generic;
+using FluentValidation;
 
 namespace BakuchiApi.Controllers.Dtos.Validators
 {
-    public static class CustomValidators {
-
+    public static class CustomValidators
+    {
         public static IRuleBuilderOptions<T, DateTime>
             DateIsNotMoreThanOneYearLater<T>
-            (this IRuleBuilder<T, DateTime> ruleBuilder) 
+            (this IRuleBuilder<T, DateTime> ruleBuilder)
         {
             var now = DateTime.Now;
             return ruleBuilder.Must(date => date < now.AddYears(1))

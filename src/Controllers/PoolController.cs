@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using BakuchiApi.Models;
 using BakuchiApi.Controllers.Dtos;
+using BakuchiApi.Models;
 using BakuchiApi.Services.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 using status = BakuchiApi.StatusExceptions;
 
 namespace BakuchiApi.Controllers
@@ -14,7 +14,7 @@ namespace BakuchiApi.Controllers
     public class PoolController : ControllerBase
     {
         private readonly IPoolService _service;
-        private PoolDtoMapper _poolMapper;
+        private readonly PoolDtoMapper _poolMapper;
 
         public PoolController(IPoolService service)
         {
@@ -92,7 +92,7 @@ namespace BakuchiApi.Controllers
         {
             var pool = _poolMapper.MapCreateDtoToEntity(poolDto);
             await _service.CreatePool(pool);
-            return CreatedAtAction("RetrievePool", new { id = pool.Id },
+            return CreatedAtAction("RetrievePool", new {id = pool.Id},
                 _poolMapper.MapEntityToDto(pool));
         }
 

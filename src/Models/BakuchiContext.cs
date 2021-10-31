@@ -1,9 +1,13 @@
-using Microsoft.EntityFrameworkCore;
 using BakuchiApi.Models;
 using BakuchiApi.Models.Configuration;
+using Microsoft.EntityFrameworkCore;
 
-public class BakuchiContext: DbContext
+public class BakuchiContext : DbContext
 {
+    public BakuchiContext(DbContextOptions<BakuchiContext> options) : base(options)
+    {
+    }
+
     public DbSet<User> Users { get; set; }
     public DbSet<Event> Events { get; set; }
     public DbSet<Pool> Pools { get; set; }
@@ -11,11 +15,6 @@ public class BakuchiContext: DbContext
     public DbSet<Server> Servers { get; set; }
     public DbSet<Outcome> Outcomes { get; set; }
     public DbSet<Result> Results { get; set; }
-
-    public BakuchiContext(DbContextOptions<BakuchiContext> options) : base(options)
-    {
-
-    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

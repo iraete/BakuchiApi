@@ -1,9 +1,8 @@
 using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace BakuchiApi.Controllers.Dtos
 {
-    public abstract class DtoMapper<TSource, TEntityDto, 
+    public abstract class DtoMapper<TSource, TEntityDto,
         TUpdateEntityDto, TCreateEntityDto>
     {
         public abstract TEntityDto MapEntityToDto(TSource entity);
@@ -15,13 +14,9 @@ namespace BakuchiApi.Controllers.Dtos
             List<TSource> entities)
         {
             var dtos = new List<TEntityDto>();
-            foreach(var entity in entities)
-            {
-                dtos.Add(MapEntityToDto(entity));
-            }
+            foreach (var entity in entities) dtos.Add(MapEntityToDto(entity));
 
             return dtos;
         }
-
     }
 }

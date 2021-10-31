@@ -1,20 +1,19 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using BakuchiApi.Models;
 using BakuchiApi.Models.Validators;
-using BakuchiApi.StatusExceptions;
 using BakuchiApi.Services.Interfaces;
-
+using BakuchiApi.StatusExceptions;
+using Microsoft.EntityFrameworkCore;
 
 namespace BakuchiApi.Services
 {
     public class OutcomeService : IOutcomeService
     {
-        private OutcomeValidator _validator;
         private readonly BakuchiContext _context;
+        private readonly OutcomeValidator _validator;
 
         public OutcomeService(BakuchiContext context)
         {
@@ -48,10 +47,8 @@ namespace BakuchiApi.Services
                 {
                     throw new NotFoundException();
                 }
-                else
-                {
-                    throw;
-                }
+
+                throw;
             }
         }
 
@@ -71,7 +68,7 @@ namespace BakuchiApi.Services
         public bool OutcomeExists(Guid eventId, string alias)
         {
             return _context.Outcomes.Any(o => o.EventId == eventId
-                && o.Alias == alias);
+                                              && o.Alias == alias);
         }
 
         private void Validate(Outcome outcomeObj)

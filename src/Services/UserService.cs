@@ -2,18 +2,18 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using BakuchiApi.Models;
 using BakuchiApi.Models.Validators;
-using BakuchiApi.StatusExceptions;
 using BakuchiApi.Services.Interfaces;
+using BakuchiApi.StatusExceptions;
+using Microsoft.EntityFrameworkCore;
 
 namespace BakuchiApi.Services
 {
     public class UserService : IUserService
     {
-        private UserValidator _validator;
         private readonly BakuchiContext _context;
+        private readonly UserValidator _validator;
 
         public UserService(BakuchiContext context)
         {
@@ -52,15 +52,14 @@ namespace BakuchiApi.Services
                 {
                     throw new NotFoundException();
                 }
-                else if (user.DiscordId != null 
+
+                if (user.DiscordId != null
                     && !DiscordIdExists(user.DiscordId))
                 {
                     throw new ConflictException();
                 }
-                else
-                {
-                    throw;
-                }
+
+                throw;
             }
         }
 
@@ -75,16 +74,14 @@ namespace BakuchiApi.Services
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (user.DiscordId != null 
+                if (user.DiscordId != null
                     && !DiscordIdExists(user.DiscordId))
                 {
                     throw new ConflictException("A user with the provided "
-                        + "Discord ID already exists.");
+                                                + "Discord ID already exists.");
                 }
-                else
-                {
-                    throw;
-                }
+
+                throw;
             }
         }
 

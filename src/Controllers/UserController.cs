@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using BakuchiApi.Models;
 using BakuchiApi.Controllers.Dtos;
+using BakuchiApi.Models;
 using BakuchiApi.Services.Interfaces;
 using BakuchiApi.StatusExceptions;
+using Microsoft.AspNetCore.Mvc;
 
 namespace BakuchiApi.Controllers
 {
@@ -13,8 +13,8 @@ namespace BakuchiApi.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private UserDtoMapper _mapper;
-        private IUserService _service;
+        private readonly UserDtoMapper _mapper;
+        private readonly IUserService _service;
 
         public UserController(IUserService service)
         {
@@ -41,7 +41,7 @@ namespace BakuchiApi.Controllers
 
         // GET: api/User/5
         [HttpGet("discord/{discordId}")]
-        public async Task<ActionResult<UserDto>> 
+        public async Task<ActionResult<UserDto>>
             RetrieveUserByDiscordId(long discordId)
         {
             var user = await _service.RetrieveUserByDiscordId(discordId);
@@ -80,8 +80,8 @@ namespace BakuchiApi.Controllers
         {
             var user = _mapper.MapCreateDtoToEntity(userDto);
             await _service.CreateUser(user);
-            return CreatedAtAction("RetrieveUser", new { id = user.Id },
-                 _mapper.MapEntityToDto(user));
+            return CreatedAtAction("RetrieveUser", new {id = user.Id},
+                _mapper.MapEntityToDto(user));
         }
 
         // DELETE: api/User/5
@@ -101,7 +101,7 @@ namespace BakuchiApi.Controllers
             var eventmapper = new EventDtoMapper();
             var user = await _service.RetrieveUser(id);
             CheckIfUserExists(user);
-            var events =  _service.RetrieveEvents(user);
+            var events = _service.RetrieveEvents(user);
             return eventmapper.MapEntitiesToDtos(events);
         }
 

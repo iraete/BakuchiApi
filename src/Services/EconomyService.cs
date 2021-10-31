@@ -16,7 +16,7 @@ namespace BakuchiApi.Services
                 throw new BadRequestException("Negative amount supplied");
             }
 
-            return (userFunds - amount >= 0);
+            return userFunds - amount >= 0;
         }
 
         public void AddFunds(User toUser, double amount)
@@ -30,12 +30,12 @@ namespace BakuchiApi.Services
         }
 
         public void TransferFundsBetweenUsers(User toUser, User fromUser,
-             double amount)
+            double amount)
         {
             if (toUser == null || fromUser == null)
             {
                 throw new BadRequestException("One or more supplied "
-                    + "users is null");
+                                              + "users is null");
             }
 
             if (IsEnoughFunds(fromUser.Balance, amount))
@@ -46,7 +46,7 @@ namespace BakuchiApi.Services
             else
             {
                 throw new BadRequestException("User does not have "
-                    + "enough funds.");
+                                              + "enough funds.");
             }
         }
 
@@ -62,7 +62,7 @@ namespace BakuchiApi.Services
                 throw new BadRequestException("Supplied user is null");
             }
 
-            Random random = new Random();
+            var random = new Random();
             double dailyReward = random.Next(1000);
             user.Balance += dailyReward;
             user.LastRewardTime = DateTime.Now;
@@ -72,7 +72,7 @@ namespace BakuchiApi.Services
         {
             if (pool == null || pool.Wagers == null)
             {
-                throw new 
+                throw new
                     BadRequestException(
                         "Pool not supplied or pool has no wagers");
             }
@@ -96,6 +96,5 @@ namespace BakuchiApi.Services
 
             return updatedUsers;
         }
-
     }
 }

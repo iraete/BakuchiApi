@@ -1,5 +1,4 @@
 using System;
-using System.ComponentModel.DataAnnotations;
 using BakuchiApi.Models;
 
 namespace BakuchiApi.Controllers.Dtos
@@ -25,7 +24,7 @@ namespace BakuchiApi.Controllers.Dtos
     }
 
 
-    public class UserDtoMapper : DtoMapper<User, UserDto, 
+    public class UserDtoMapper : DtoMapper<User, UserDto,
         UpdateUserDto, CreateUserDto>
     {
         public override UserDto MapEntityToDto(User u)
@@ -46,7 +45,7 @@ namespace BakuchiApi.Controllers.Dtos
             {
                 Id = dto.Id,
                 DiscordId = dto.DiscordId,
-                Balance = (double) dto.Balance,
+                Balance = dto.Balance,
                 Name = dto.Name,
                 LastRewardTime = dto.LastRewardTime
             };

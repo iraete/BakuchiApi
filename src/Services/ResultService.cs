@@ -1,29 +1,24 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using BakuchiApi.Models;
 using BakuchiApi.Models.Validators;
-using BakuchiApi.StatusExceptions;
 using BakuchiApi.Services.Interfaces;
+using BakuchiApi.StatusExceptions;
+using Microsoft.EntityFrameworkCore;
 
 namespace BakuchiApi.Services
 {
     public class ResultService : IResultService
     {
-        private ResultValidator _validator;
         private readonly BakuchiContext _context;
+        private readonly ResultValidator _validator;
 
         public ResultService(BakuchiContext context)
         {
             _validator = new ResultValidator();
             _context = context;
-        }
-
-        public async Task<Result> RetrieveResult(Guid eventId, uint outcomeId)
-        {
-            return await _context.Results.FindAsync(eventId, outcomeId);
         }
 
         public async Task<List<Result>> RetrieveResultsByEvent(Guid eventId)
@@ -48,10 +43,8 @@ namespace BakuchiApi.Services
                 {
                     throw new NotFoundException();
                 }
-                else
-                {
-                    throw;
-                }
+
+                throw;
             }
         }
 
@@ -71,7 +64,12 @@ namespace BakuchiApi.Services
         public bool ResultExists(Guid eventId, uint outcomeId)
         {
             return _context.Results.Any(r => r.EventId == eventId
-                && r.OutcomeId == outcomeId);
+                                             && r.OutcomeId == outcomeId);
+        }
+
+        public async Task<Result> RetrieveResult(Guid eventId, uint outcomeId)
+        {
+            return await _context.Results.FindAsync(eventId, outcomeId);
         }
 
         private void Validate(Result resultObj)

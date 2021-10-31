@@ -3,8 +3,8 @@ using System.Net;
 namespace BakuchiApi.StatusExceptions
 {
     public class NotFoundException : BaseServiceException
-    {  
-        public NotFoundException(string message = null): base(message)
+    {
+        public NotFoundException(string message = null) : base(message)
         {
             Status = HttpStatusCode.NotFound;
         }
@@ -12,7 +12,7 @@ namespace BakuchiApi.StatusExceptions
 
     public class ConflictException : BaseServiceException
     {
-        public ConflictException(string message = null): base(message) 
+        public ConflictException(string message = null) : base(message)
         {
             Status = HttpStatusCode.Conflict;
         }
@@ -20,7 +20,7 @@ namespace BakuchiApi.StatusExceptions
 
     public class BadRequestException : BaseServiceException
     {
-        public BadRequestException(string message = null): base(message) 
+        public BadRequestException(string message = null) : base(message)
         {
             Status = HttpStatusCode.BadRequest;
         }
@@ -28,7 +28,7 @@ namespace BakuchiApi.StatusExceptions
 
     public class ForbiddenException : BaseServiceException
     {
-        public ForbiddenException(string message = null): base(message)
+        public ForbiddenException(string message = null) : base(message)
         {
             Status = HttpStatusCode.Forbidden;
         }

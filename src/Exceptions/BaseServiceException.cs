@@ -5,13 +5,15 @@ namespace BakuchiApi.StatusExceptions
 {
     public abstract class BaseServiceException : Exception
     {
-        public HttpStatusCode Status { get; set; } = 
-            HttpStatusCode.InternalServerError;
-
         public BaseServiceException()
-        { }
-        
+        {
+        }
+
         public BaseServiceException(string message) : base(message)
-        { }
+        {
+        }
+
+        public HttpStatusCode Status { get; set; } =
+            HttpStatusCode.InternalServerError;
     }
 }

@@ -2,19 +2,18 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using BakuchiApi.Models;
-using BakuchiApi.StatusExceptions;
-using BakuchiApi.Services.Interfaces;
 using BakuchiApi.Models.Validators;
-
+using BakuchiApi.Services.Interfaces;
+using BakuchiApi.StatusExceptions;
+using Microsoft.EntityFrameworkCore;
 
 namespace BakuchiApi.Services
 {
     public class EventService : IEventService
     {
-        private EventValidator _validator;
         private readonly BakuchiContext _context;
+        private readonly EventValidator _validator;
 
         public EventService(BakuchiContext context)
         {
@@ -38,7 +37,7 @@ namespace BakuchiApi.Services
             _context.Entry(eventObj).State = EntityState.Modified;
 
             try
-            {                
+            {
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
@@ -47,10 +46,8 @@ namespace BakuchiApi.Services
                 {
                     throw new NotFoundException();
                 }
-                else
-                {
-                    throw;
-                }
+
+                throw;
             }
         }
 
@@ -71,10 +68,8 @@ namespace BakuchiApi.Services
                 {
                     throw new ConflictException();
                 }
-                else
-                {
-                    throw;
-                }
+
+                throw;
             }
         }
 

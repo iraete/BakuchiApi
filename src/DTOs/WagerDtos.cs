@@ -1,7 +1,6 @@
 using System;
-using BakuchiApi.Models.Enums;
-using System.ComponentModel.DataAnnotations;
 using BakuchiApi.Models;
+using BakuchiApi.Models.Enums;
 
 namespace BakuchiApi.Controllers.Dtos
 {
@@ -27,9 +26,10 @@ namespace BakuchiApi.Controllers.Dtos
     }
 
     public class UpdateWagerDto : CreateWagerDto
-    { }
+    {
+    }
 
-    public class WagerDtoMapper : DtoMapper<Wager, WagerDto, 
+    public class WagerDtoMapper : DtoMapper<Wager, WagerDto,
         UpdateWagerDto, CreateWagerDto>
     {
         public override WagerDto MapEntityToDto(Wager w)
@@ -53,7 +53,7 @@ namespace BakuchiApi.Controllers.Dtos
                 EventId = dto.EventId,
                 PoolId = dto.PoolId,
                 OutcomeId = dto.OutcomeId,
-                Amount = (int) dto.Amount,
+                Amount = dto.Amount,
                 BetType = dto.BetType
             };
         }
@@ -66,11 +66,13 @@ namespace BakuchiApi.Controllers.Dtos
                 EventId = dto.EventId,
                 PoolId = dto.PoolId,
                 OutcomeId = dto.OutcomeId,
-                Amount = (int) dto.Amount,
+                Amount = (int) dto.Amount
             };
         }
 
         public override Wager MapUpdateDtoToEntity(UpdateWagerDto dto)
-            => MapCreateDtoToEntity(dto);
+        {
+            return MapCreateDtoToEntity(dto);
+        }
     }
 }

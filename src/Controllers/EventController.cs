@@ -1,11 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using BakuchiApi.Controllers.Dtos;
 using BakuchiApi.Services.Interfaces;
 using BakuchiApi.StatusExceptions;
+using Microsoft.AspNetCore.Mvc;
 
 namespace BakuchiApi.Controllers
 {
@@ -13,10 +12,10 @@ namespace BakuchiApi.Controllers
     [ApiController]
     public class EventController : ControllerBase
     {
-        private IEventService _eventService;
-        private IUserService _userService;
-        private EventDtoMapper _eventMapper;
-        private UserDtoMapper _userMapper;
+        private readonly EventDtoMapper _eventMapper;
+        private readonly IEventService _eventService;
+        private readonly UserDtoMapper _userMapper;
+        private readonly IUserService _userService;
 
         public EventController(IEventService eventService, IUserService userService)
         {
@@ -54,7 +53,7 @@ namespace BakuchiApi.Controllers
         public async Task<IActionResult> UpdateEvent(
             Guid id, UpdateEventDto eventDto)
         {
-            if (id != eventDto.Id 
+            if (id != eventDto.Id
                 || !ValidateDates(eventDto.Start, eventDto.End))
             {
                 throw new BadRequestException();
@@ -68,7 +67,7 @@ namespace BakuchiApi.Controllers
             {
                 throw new NotFoundException();
             }
-            
+
             entity.Description = @event.Description;
             entity.Start = @event.Start;
             entity.End = @event.End;
@@ -80,7 +79,7 @@ namespace BakuchiApi.Controllers
         // POST: api/Event
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<EventDto>> 
+        public async Task<ActionResult<EventDto>>
             CreateEvent(CreateEventDto eventDto)
         {
             if (!ValidateDates(eventDto.Start, eventDto.End))
@@ -97,7 +96,7 @@ namespace BakuchiApi.Controllers
             var @event = _eventMapper.MapCreateDtoToEntity(eventDto);
             await _eventService.CreateEvent(@event);
 
-            return CreatedAtAction("RetrieveEvent", new { id = @event.Id }, 
+            return CreatedAtAction("RetrieveEvent", new {id = @event.Id},
                 _eventMapper.MapEntityToDto(@event));
         }
 
@@ -124,11 +123,12 @@ namespace BakuchiApi.Controllers
         private async Task CreateUser(CreateEventDto eventDto)
         {
             var user = _userMapper.MapCreateDtoToEntity(
-                    new CreateUserDto {
-                        Name = eventDto.UserName,
-                        DiscordId = eventDto.DiscordId
-                    }
-                );
+                new CreateUserDto
+                {
+                    Name = eventDto.UserName,
+                    DiscordId = eventDto.DiscordId
+                }
+            );
             await _userService.CreateUser(user);
             eventDto.UserId = user.Id;
         }

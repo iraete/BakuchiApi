@@ -1,6 +1,5 @@
 using System;
 using BakuchiApi.Models;
-using System.ComponentModel.DataAnnotations;
 
 namespace BakuchiApi.Controllers.Dtos
 {
@@ -20,7 +19,8 @@ namespace BakuchiApi.Controllers.Dtos
     }
 
     public class UpdateOutcomeDto : CreateOutcomeDto
-    { }
+    {
+    }
 
     public class OutcomeDtoMapper : DtoMapper<Outcome, OutcomeDto,
         UpdateOutcomeDto, CreateOutcomeDto>
@@ -42,7 +42,7 @@ namespace BakuchiApi.Controllers.Dtos
             {
                 EventId = dto.EventId,
                 Alias = dto.Alias,
-                Name = dto.Name,
+                Name = dto.Name
             };
         }
 
@@ -52,11 +52,13 @@ namespace BakuchiApi.Controllers.Dtos
             {
                 EventId = dto.EventId,
                 Alias = dto.Alias,
-                Name = dto.Name,
+                Name = dto.Name
             };
         }
 
-        public override Outcome MapUpdateDtoToEntity(UpdateOutcomeDto dto) 
-            => MapCreateDtoToEntity(dto);
+        public override Outcome MapUpdateDtoToEntity(UpdateOutcomeDto dto)
+        {
+            return MapCreateDtoToEntity(dto);
+        }
     }
 }

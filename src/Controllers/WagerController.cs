@@ -1,13 +1,8 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using BakuchiApi.Models;
 using BakuchiApi.Controllers.Dtos;
 using BakuchiApi.Services.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 using status = BakuchiApi.StatusExceptions;
 
 namespace BakuchiApi.Controllers
@@ -17,7 +12,7 @@ namespace BakuchiApi.Controllers
     public class WagerController : ControllerBase
     {
         private readonly IWagerService _service;
-        private WagerDtoMapper _wagerMapper;
+        private readonly WagerDtoMapper _wagerMapper;
 
         public WagerController(IWagerService service)
         {
@@ -89,9 +84,9 @@ namespace BakuchiApi.Controllers
                 throw new Exception("Error adding wager");
             }
 
-            return CreatedAtAction("RetrieveWager", new 
-                { 
-                    userId = wager.UserId, 
+            return CreatedAtAction("RetrieveWager", new
+                {
+                    userId = wager.UserId,
                     poolId = wager.PoolId
                 },
                 _wagerMapper.MapEntityToDto(wager));

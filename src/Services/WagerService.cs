@@ -2,19 +2,18 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using BakuchiApi.Models;
 using BakuchiApi.Models.Validators;
-using BakuchiApi.StatusExceptions;
 using BakuchiApi.Services.Interfaces;
-
+using BakuchiApi.StatusExceptions;
+using Microsoft.EntityFrameworkCore;
 
 namespace BakuchiApi.Services
 {
     public class WagerService : IWagerService
     {
-        private WagerValidator _validator;
         private readonly BakuchiContext _context;
+        private readonly WagerValidator _validator;
 
         public WagerService(BakuchiContext context)
         {
@@ -25,7 +24,7 @@ namespace BakuchiApi.Services
         public bool WagerExists(Guid userId, Guid eventPoolId)
         {
             return _context.Wagers.Any(uw => uw.UserId == userId
-                && uw.PoolId == eventPoolId);
+                                             && uw.PoolId == eventPoolId);
         }
 
         public async Task<List<Wager>> RetrieveWagers(Guid userId)
@@ -54,10 +53,8 @@ namespace BakuchiApi.Services
                 {
                     throw new NotFoundException();
                 }
-                else
-                {
-                    throw;
-                }
+
+                throw;
             }
         }
 
@@ -76,10 +73,8 @@ namespace BakuchiApi.Services
                 {
                     throw new ConflictException();
                 }
-                else
-                {
-                    throw;
-                }
+
+                throw;
             }
         }
 

@@ -10,8 +10,8 @@ namespace BakuchiApi.Models.Validators
             RuleFor(wager => wager.PoolId).NotNull();
             RuleFor(wager => wager.Amount).NotNull();
             RuleFor(wager => wager.OutcomeId).NotNull();
-            RuleFor(wager => wager.BetType).NotNull();            
-            RuleFor(wager => wager.EventId).NotNull();            
+            RuleFor(wager => wager.BetType).NotNull();
+            RuleFor(wager => wager.EventId).NotNull();
         }
     }
 }

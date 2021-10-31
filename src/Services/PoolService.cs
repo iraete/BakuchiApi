@@ -1,20 +1,19 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using BakuchiApi.Models;
 using BakuchiApi.Models.Validators;
-using BakuchiApi.StatusExceptions;
 using BakuchiApi.Services.Interfaces;
-
+using BakuchiApi.StatusExceptions;
+using Microsoft.EntityFrameworkCore;
 
 namespace BakuchiApi.Services
 {
     public class PoolService : IPoolService
     {
-        private PoolValidator _validator;
         private readonly BakuchiContext _context;
+        private readonly PoolValidator _validator;
 
         public PoolService(BakuchiContext context)
         {
@@ -53,10 +52,8 @@ namespace BakuchiApi.Services
                 {
                     throw new NotFoundException();
                 }
-                else
-                {
-                    throw;
-                }
+
+                throw;
             }
         }
 

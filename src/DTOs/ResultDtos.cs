@@ -1,6 +1,5 @@
 using System;
 using BakuchiApi.Models;
-using System.ComponentModel.DataAnnotations;
 
 namespace BakuchiApi.Controllers.Dtos
 {
@@ -20,7 +19,8 @@ namespace BakuchiApi.Controllers.Dtos
     }
 
     public class UpdateResultDto : CreateResultDto
-    { }
+    {
+    }
 
     public class ResultDtoMapper : DtoMapper<Result, ResultDto,
         UpdateResultDto, CreateResultDto>
@@ -57,6 +57,8 @@ namespace BakuchiApi.Controllers.Dtos
         }
 
         public override Result MapUpdateDtoToEntity(UpdateResultDto dto)
-            => MapCreateDtoToEntity(dto);
+        {
+            return MapCreateDtoToEntity(dto);
+        }
     }
 }

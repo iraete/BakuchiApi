@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using BakuchiApi.Models;
 using BakuchiApi.Controllers.Dtos;
+using BakuchiApi.Models;
 using BakuchiApi.Services.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 using status = BakuchiApi.StatusExceptions;
 
 namespace BakuchiApi.Controllers
@@ -14,7 +14,7 @@ namespace BakuchiApi.Controllers
     public class OutcomeController : ControllerBase
     {
         private readonly IOutcomeService _service;
-        private OutcomeDtoMapper _outcomeMapper;
+        private readonly OutcomeDtoMapper _outcomeMapper;
 
         public OutcomeController(IOutcomeService service)
         {
@@ -91,8 +91,11 @@ namespace BakuchiApi.Controllers
 
             var outcome = _outcomeMapper.MapCreateDtoToEntity(outcomeDto);
             await _service.CreateOutcome(outcome);
-            return CreatedAtAction("RetrieveOutcome", new { eventId = eventId, 
-                alias = outcomeDto.Alias },
+            return CreatedAtAction("RetrieveOutcome", new
+                {
+                    eventId,
+                    alias = outcomeDto.Alias
+                },
                 _outcomeMapper.MapEntityToDto(outcome));
         }
 

@@ -1,7 +1,6 @@
 using System;
-using BakuchiApi.Models.Enums;
 using BakuchiApi.Models;
-using System.ComponentModel.DataAnnotations;
+using BakuchiApi.Models.Enums;
 
 namespace BakuchiApi.Controllers.Dtos
 {
@@ -30,7 +29,7 @@ namespace BakuchiApi.Controllers.Dtos
         public string Description { get; set; }
     }
 
-    public class PoolDtoMapper : DtoMapper<Pool, PoolDto, 
+    public class PoolDtoMapper : DtoMapper<Pool, PoolDto,
         UpdatePoolDto, CreatePoolDto>
     {
         public override PoolDto MapEntityToDto(Pool p)
@@ -71,7 +70,6 @@ namespace BakuchiApi.Controllers.Dtos
 
         public override Pool MapUpdateDtoToEntity(UpdatePoolDto dto)
         {
-
             return new Pool
             {
                 Id = dto.Id,
@@ -79,7 +77,6 @@ namespace BakuchiApi.Controllers.Dtos
                 BetType = dto.BetType,
                 Description = dto.Description
             };
-
         }
     }
 }

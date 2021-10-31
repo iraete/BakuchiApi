@@ -8,7 +8,7 @@ namespace BakuchiApi.Models.Validators
         {
             RuleFor(outcome => outcome.EventId).NotNull();
             RuleFor(outcome => outcome.Name).NotNull();
-            RuleFor(outcome => outcome.Alias).NotNull();     
+            RuleFor(outcome => outcome.Alias).NotNull();
         }
     }
 }

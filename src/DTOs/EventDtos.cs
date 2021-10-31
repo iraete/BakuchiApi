@@ -1,7 +1,5 @@
 using System;
-using System.ComponentModel.DataAnnotations;
 using BakuchiApi.Models;
-using BakuchiApi.Controllers.Dtos.Validators;
 
 namespace BakuchiApi.Controllers.Dtos
 {
@@ -97,6 +95,5 @@ namespace BakuchiApi.Controllers.Dtos
                 End = e.End
             };
         }
-
     }
 }
