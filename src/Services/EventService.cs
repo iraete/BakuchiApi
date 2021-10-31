@@ -4,18 +4,21 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using BakuchiApi.Models;
-using status = BakuchiApi.StatusExceptions;
+using BakuchiApi.StatusExceptions;
 using BakuchiApi.Services.Interfaces;
+using BakuchiApi.Models.Validators;
 
 
 namespace BakuchiApi.Services
 {
     public class EventService : IEventService
     {
+        private EventValidator _validator;
         private readonly BakuchiContext _context;
 
         public EventService(BakuchiContext context)
         {
+            _validator = new EventValidator();
             _context = context;
         }
 
@@ -31,6 +34,7 @@ namespace BakuchiApi.Services
 
         public async Task UpdateEvent(Event eventObj)
         {
+            Validate(eventObj);
             _context.Entry(eventObj).State = EntityState.Modified;
 
             try
@@ -41,21 +45,22 @@ namespace BakuchiApi.Services
             {
                 if (!EventExists(eventObj.Id))
                 {
-                    throw new status.NotFoundException();
+                    throw new NotFoundException();
                 }
                 else
                 {
                     throw;
                 }
             }
-
         }
 
         public async Task CreateEvent(Event eventObj)
         {
             eventObj.Id = Guid.NewGuid();
             eventObj.Created = DateTime.Now;
+            Validate(eventObj);
             _context.Events.Add(eventObj);
+
             try
             {
                 await _context.SaveChangesAsync();
@@ -64,7 +69,7 @@ namespace BakuchiApi.Services
             {
                 if (EventExists(eventObj.Id))
                 {
-                    throw new status.ConflictException();
+                    throw new ConflictException();
                 }
                 else
                 {
@@ -82,6 +87,15 @@ namespace BakuchiApi.Services
         public bool EventExists(Guid id)
         {
             return _context.Events.Any(e => e.Id == id);
+        }
+
+        private void Validate(Event eventObj)
+        {
+            var validationResult = _validator.Validate(eventObj);
+            if (!validationResult.IsValid)
+            {
+                throw new BadRequestException(validationResult.Errors.ToString());
+            }
         }
     }
 }

@@ -4,17 +4,20 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using BakuchiApi.Models;
-using status = BakuchiApi.StatusExceptions;
+using BakuchiApi.Models.Validators;
+using BakuchiApi.StatusExceptions;
 using BakuchiApi.Services.Interfaces;
 
 namespace BakuchiApi.Services
 {
     public class ResultService : IResultService
     {
+        private ResultValidator _validator;
         private readonly BakuchiContext _context;
 
         public ResultService(BakuchiContext context)
         {
+            _validator = new ResultValidator();
             _context = context;
         }
 
@@ -31,6 +34,7 @@ namespace BakuchiApi.Services
 
         public async Task UpdateResult(Result result)
         {
+            Validate(result);
             result.LastEdited = DateTime.Now;
             _context.Entry(result).State = EntityState.Modified;
 
@@ -42,7 +46,7 @@ namespace BakuchiApi.Services
             {
                 if (!ResultExists(result.EventId, result.OutcomeId))
                 {
-                    throw new status.NotFoundException();
+                    throw new NotFoundException();
                 }
                 else
                 {
@@ -53,6 +57,7 @@ namespace BakuchiApi.Services
 
         public async Task CreateResult(Result result)
         {
+            Validate(result);
             _context.Results.Add(result);
             await _context.SaveChangesAsync();
         }
@@ -67,6 +72,15 @@ namespace BakuchiApi.Services
         {
             return _context.Results.Any(r => r.EventId == eventId
                 && r.OutcomeId == outcomeId);
+        }
+
+        private void Validate(Result resultObj)
+        {
+            var validationResult = _validator.Validate(resultObj);
+            if (!validationResult.IsValid)
+            {
+                throw new BadRequestException(validationResult.Errors.ToString());
+            }
         }
     }
 }

@@ -4,7 +4,8 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using BakuchiApi.Models;
-using status = BakuchiApi.StatusExceptions;
+using BakuchiApi.Models.Validators;
+using BakuchiApi.StatusExceptions;
 using BakuchiApi.Services.Interfaces;
 
 
@@ -12,10 +13,12 @@ namespace BakuchiApi.Services
 {
     public class PoolService : IPoolService
     {
+        private PoolValidator _validator;
         private readonly BakuchiContext _context;
 
         public PoolService(BakuchiContext context)
         {
+            _validator = new PoolValidator();
             _context = context;
         }
 
@@ -37,6 +40,7 @@ namespace BakuchiApi.Services
 
         public async Task UpdatePool(Pool pool)
         {
+            Validate(pool);
             _context.Entry(pool).State = EntityState.Modified;
 
             try
@@ -47,7 +51,7 @@ namespace BakuchiApi.Services
             {
                 if (!PoolExists(pool.Id))
                 {
-                    throw new status.NotFoundException();
+                    throw new NotFoundException();
                 }
                 else
                 {
@@ -58,6 +62,8 @@ namespace BakuchiApi.Services
 
         public async Task CreatePool(Pool pool)
         {
+            pool.Id = Guid.NewGuid();
+            Validate(pool);
             _context.Pools.Add(pool);
             await _context.SaveChangesAsync();
         }
@@ -71,6 +77,15 @@ namespace BakuchiApi.Services
         public bool PoolExists(Guid id)
         {
             return _context.Pools.Any(e => e.Id == id);
+        }
+
+        private void Validate(Pool poolObj)
+        {
+            var validationResult = _validator.Validate(poolObj);
+            if (!validationResult.IsValid)
+            {
+                throw new BadRequestException(validationResult.Errors.ToString());
+            }
         }
     }
 }

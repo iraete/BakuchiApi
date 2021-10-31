@@ -4,7 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using BakuchiApi.Models;
-using status = BakuchiApi.StatusExceptions;
+using BakuchiApi.Models.Validators;
+using BakuchiApi.StatusExceptions;
 using BakuchiApi.Services.Interfaces;
 
 
@@ -12,10 +13,12 @@ namespace BakuchiApi.Services
 {
     public class WagerService : IWagerService
     {
+        private WagerValidator _validator;
         private readonly BakuchiContext _context;
 
         public WagerService(BakuchiContext context)
         {
+            _validator = new WagerValidator();
             _context = context;
         }
 
@@ -38,6 +41,7 @@ namespace BakuchiApi.Services
 
         public async Task UpdateWager(Wager userWager)
         {
+            Validate(userWager);
             _context.Entry(userWager).State = EntityState.Modified;
 
             try
@@ -48,7 +52,7 @@ namespace BakuchiApi.Services
             {
                 if (!WagerExists(userWager.UserId, userWager.PoolId))
                 {
-                    throw new status.NotFoundException();
+                    throw new NotFoundException();
                 }
                 else
                 {
@@ -59,6 +63,7 @@ namespace BakuchiApi.Services
 
         public async Task CreateWager(Wager userWager)
         {
+            Validate(userWager);
             _context.Wagers.Add(userWager);
 
             try
@@ -69,7 +74,7 @@ namespace BakuchiApi.Services
             {
                 if (WagerExists(userWager.UserId, userWager.PoolId))
                 {
-                    throw new status.ConflictException();
+                    throw new ConflictException();
                 }
                 else
                 {
@@ -82,6 +87,15 @@ namespace BakuchiApi.Services
         {
             _context.Wagers.Remove(userWager);
             await _context.SaveChangesAsync();
+        }
+
+        private void Validate(Wager wagerObj)
+        {
+            var validationResult = _validator.Validate(wagerObj);
+            if (!validationResult.IsValid)
+            {
+                throw new BadRequestException(validationResult.Errors.ToString());
+            }
         }
     }
 }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using BakuchiApi.Models;
+using BakuchiApi.Models.Validators;
 using BakuchiApi.StatusExceptions;
 using BakuchiApi.Services.Interfaces;
 
@@ -11,10 +12,12 @@ namespace BakuchiApi.Services
 {
     public class UserService : IUserService
     {
+        private UserValidator _validator;
         private readonly BakuchiContext _context;
 
         public UserService(BakuchiContext context)
         {
+            _validator = new UserValidator();
             _context = context;
         }
 
@@ -36,6 +39,7 @@ namespace BakuchiApi.Services
 
         public async Task UpdateUser(User user)
         {
+            Validate(user);
             _context.Entry(user).State = EntityState.Modified;
 
             try
@@ -58,13 +62,12 @@ namespace BakuchiApi.Services
                     throw;
                 }
             }
-
         }
 
         public async Task CreateUser(User user)
         {
             user.Id = Guid.NewGuid();
-
+            Validate(user);
             try
             {
                 _context.Users.Add(user);
@@ -109,6 +112,15 @@ namespace BakuchiApi.Services
         public bool DiscordIdExists(long? id)
         {
             return _context.Users.Any(e => e.DiscordId == id);
+        }
+
+        private void Validate(User userObj)
+        {
+            var validationResult = _validator.Validate(userObj);
+            if (!validationResult.IsValid)
+            {
+                throw new BadRequestException(validationResult.Errors.ToString());
+            }
         }
     }
 }
