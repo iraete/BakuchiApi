@@ -1,4 +1,5 @@
 using System.Data.SqlClient;
+using System.Reflection;
 using BakuchiApi.Middleware;
 using BakuchiApi.Services;
 using BakuchiApi.Services.Interfaces;
@@ -45,12 +46,15 @@ namespace BakuchiApi
             // Other service-layer services
             services.AddScoped<IEconomyService, EconomyService>();
 
-            // Add controllers
+            // Add controllers and validation
             services.AddControllers()
                 .AddFluentValidation(
                     fv =>
                         fv.RegisterValidatorsFromAssemblyContaining<Startup>())
                 .AddNewtonsoftJson();
+            
+            // AutoMapper
+            services.AddAutoMapper(Assembly.GetExecutingAssembly());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -1,7 +1,7 @@
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using BakuchiApi.Controllers.Dtos;
+using BakuchiApi.Contracts;
+using BakuchiApi.Contracts.Requests;
 using BakuchiApi.Models;
 using BakuchiApi.Services.Interfaces;
 using BakuchiApi.StatusExceptions;
@@ -13,115 +13,55 @@ namespace BakuchiApi.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private readonly UserDtoMapper _mapper;
         private readonly IUserService _service;
 
         public UserController(IUserService service)
         {
             _service = service;
-            _mapper = new UserDtoMapper();
         }
 
-        // GET: api/User
         [HttpGet]
         public async Task<ActionResult<IEnumerable<UserDto>>> RetrieveUsers()
         {
-            var users = await _service.RetrieveUsers();
-            return _mapper.MapEntitiesToDtos(users);
+            return await _service.RetrieveUsers();
         }
 
-        // GET: api/User/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<UserDto>> RetrieveUser(Guid id)
+        public async Task<ActionResult<UserDto>> RetrieveUser(long id)
         {
             var user = await _service.RetrieveUser(id);
-            CheckIfUserExists(user);
-            return _mapper.MapEntityToDto(user);
+            if (user == null)
+            {
+                throw new BadRequestException();
+            }
+
+            return user;
         }
 
-        // GET: api/User/5
-        [HttpGet("discord/{discordId}")]
-        public async Task<ActionResult<UserDto>>
-            RetrieveUserByDiscordId(long discordId)
-        {
-            var user = await _service.RetrieveUserByDiscordId(discordId);
-            CheckIfUserExists(user);
-            return _mapper.MapEntityToDto(user);
-        }
-
-        // PUT: api/User/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateUser(Guid id, UpdateUserDto userDto)
+        public async Task<IActionResult> UpdateUserInfo(long id, UpdateUserInfoDto userDto)
         {
             if (id != userDto.Id)
             {
                 throw new BadRequestException();
             }
 
-            var user = _mapper.MapUpdateDtoToEntity(userDto);
-            var entity = await _service.RetrieveUser(id);
-
-            CheckIfUserExists(entity);
-
-            entity.Name = user.Name;
-            entity.DiscordId = user.DiscordId;
-            entity.Email = user.Email;
-
-            await _service.UpdateUser(entity);
-
+            await _service.UpdateUserInfo(userDto);
             return NoContent();
         }
 
-        // POST: api/User
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<User>> CreateUser(CreateUserDto userDto)
         {
-            var user = _mapper.MapCreateDtoToEntity(userDto);
-            await _service.CreateUser(user);
-            return CreatedAtAction("RetrieveUser", new {id = user.Id},
-                _mapper.MapEntityToDto(user));
+            await _service.CreateUser(userDto);
+            return CreatedAtAction("CreateUser", new {id = userDto.Id});
         }
 
-        // DELETE: api/User/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteUser(Guid id)
+        public async Task<IActionResult> DeleteUser(long id)
         {
-            var user = await _service.RetrieveUser(id);
-            CheckIfUserExists(user);
-            await _service.DeleteUser(user);
+            await _service.DeleteUser(id);
             return NoContent();
-        }
-
-        // GET: api/User/5/events
-        [HttpGet("{id}/events")]
-        public async Task<ActionResult<IEnumerable<EventDto>>> RetrieveUserEvents(Guid id)
-        {
-            var eventmapper = new EventDtoMapper();
-            var user = await _service.RetrieveUser(id);
-            CheckIfUserExists(user);
-            var events = _service.RetrieveEvents(user);
-            return eventmapper.MapEntitiesToDtos(events);
-        }
-
-        // GET: api/User/5/userwagers
-        [HttpGet("{id}/wagers")]
-        public async Task<ActionResult<IEnumerable<WagerDto>>> RetrieveWagers(Guid id)
-        {
-            var wagermapper = new WagerDtoMapper();
-            var user = await _service.RetrieveUser(id);
-            CheckIfUserExists(user);
-            var wagers = _service.RetrieveWagers(user);
-            return wagermapper.MapEntitiesToDtos(wagers);
-        }
-
-        private void CheckIfUserExists(User user)
-        {
-            if (user == null)
-            {
-                throw new NotFoundException();
-            }
         }
     }
 }

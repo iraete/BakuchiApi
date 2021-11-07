@@ -7,11 +7,8 @@ namespace BakuchiApi.Models.Configuration
     {
         public void Configure(EntityTypeBuilder<User> builder)
         {
-            builder.Property(u => u.Id)
-                .HasDefaultValueSql("uuid_generate_v4()");
-            builder.Property(u => u.DiscordId).IsRequired(false);
+            builder.HasKey(u => u.Id);
             builder.Property(u => u.Name).IsRequired();
-            builder.HasIndex(u => new {u.DiscordId}).IsUnique();
         }
     }
 }

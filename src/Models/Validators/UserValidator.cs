@@ -6,6 +6,7 @@ namespace BakuchiApi.Models.Validators
     {
         public UserValidator()
         {
+            RuleFor(user => user.Id).GreaterThan(0);
             RuleFor(user => user.Name).NotNull();
         }
     }
