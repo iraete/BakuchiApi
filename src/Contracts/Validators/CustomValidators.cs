@@ -1,7 +1,7 @@
 using System;
 using FluentValidation;
 
-namespace BakuchiApi.Controllers.Dtos.Validators
+namespace BakuchiApi.Contracts.Validators
 {
     public static class CustomValidators
     {

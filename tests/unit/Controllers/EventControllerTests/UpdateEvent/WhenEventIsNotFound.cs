@@ -1,4 +1,5 @@
 using System;
+using BakuchiApi.Contracts;
 using BakuchiApi.Controllers;
 using BakuchiApi.Controllers.Dtos;
 using BakuchiApi.Models;

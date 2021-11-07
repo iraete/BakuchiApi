@@ -14,16 +14,12 @@ namespace BakuchiApi.Models.Configuration
             builder.Property(e => e.Description).HasMaxLength(200);
             builder.Property(e => e.Created)
                 .HasDefaultValueSql("localtimestamp");
-
             builder.HasOne(e => e.User)
                 .WithMany(u => u.Events)
                 .HasForeignKey(p => new {p.UserId});
-
             builder.HasOne(e => e.Server)
                 .WithMany(s => s.Events)
-                .HasForeignKey(p => new {p.ServerId})
-                .IsRequired(false);
-
+                .HasForeignKey(p => new {p.ServerId});
             builder.HasIndex(e => e.Alias).IsUnique();
         }
     }

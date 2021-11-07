@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
+using BakuchiApi.Contracts;
+using BakuchiApi.Contracts.Requests;
 using BakuchiApi.Models;
-using BakuchiApi.Models.Validators;
 using BakuchiApi.Services.Interfaces;
 using BakuchiApi.StatusExceptions;
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 
 namespace BakuchiApi.Services
@@ -13,84 +15,69 @@ namespace BakuchiApi.Services
     public class EventService : IEventService
     {
         private readonly BakuchiContext _context;
-        private readonly EventValidator _validator;
+        private readonly IValidator<Event> _validator;
+        private readonly IMapper _mapper;
 
-        public EventService(BakuchiContext context)
+        public EventService(
+            BakuchiContext context,
+            IValidator<Event> validator,
+            IMapper mapper)
         {
-            _validator = new EventValidator();
+            _validator = validator;
+            _mapper = mapper;
             _context = context;
         }
 
-        public async Task<List<Event>> RetrieveEvents()
+        public async Task<List<EventDto>> RetrieveEvents()
         {
-            return await _context.Events.ToListAsync();
+            var results = await _context.Events.ToArrayAsync();
+            return _mapper.Map<Event[], List<EventDto>>(results);
         }
 
-        public async Task<Event> RetrieveEvent(Guid id)
+        public async Task<EventDto> RetrieveEvent(Guid id)
         {
-            return await _context.Events.FindAsync(id);
+            return _mapper.Map<EventDto>(await _context.Events.FindAsync(id));
         }
 
-        public async Task UpdateEvent(Event eventObj)
+        public async Task UpdateEvent(UpdateEventDto eventDto)
         {
-            Validate(eventObj);
-            _context.Entry(eventObj).State = EntityState.Modified;
+            var entity = await _context.Events.FindAsync(eventDto.Id);
 
-            try
+            if (entity == null)
             {
-                await _context.SaveChangesAsync();
+                throw new NotFoundException();
             }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!EventExists(eventObj.Id))
-                {
-                    throw new NotFoundException();
-                }
 
-                throw;
-            }
-        }
-
-        public async Task CreateEvent(Event eventObj)
-        {
-            eventObj.Id = Guid.NewGuid();
-            eventObj.Created = DateTime.Now;
-            Validate(eventObj);
-            _context.Events.Add(eventObj);
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateException)
-            {
-                if (EventExists(eventObj.Id))
-                {
-                    throw new ConflictException();
-                }
-
-                throw;
-            }
-        }
-
-        public async Task DeleteEvent(Event eventObj)
-        {
-            _context.Events.Remove(eventObj);
+            _mapper.Map(eventDto, entity);
+            await _validator.ValidateAndThrowAsync(entity);
+            _context.Entry(entity).State = EntityState.Modified;
             await _context.SaveChangesAsync();
         }
 
-        public bool EventExists(Guid id)
+        public async Task<Guid> CreateEvent(CreateEventDto eventDto)
         {
-            return _context.Events.Any(e => e.Id == id);
+            var entity = _mapper.Map<Event>(eventDto);
+            entity.Created = DateTime.Now;
+            await _validator.ValidateAndThrowAsync(entity);
+            _context.Events.Add(entity);
+            await _context.SaveChangesAsync();
+            return entity.Id;
         }
 
-        private void Validate(Event eventObj)
+        public async Task DeleteEvent(Guid eventId)
         {
-            var validationResult = _validator.Validate(eventObj);
-            if (!validationResult.IsValid)
+            var entity = await _context.Events.FindAsync(eventId);
+            if (entity != null)
             {
-                throw new BadRequestException(validationResult.Errors.ToString());
+                _context.Events.Remove(entity);
+                await _context.SaveChangesAsync();
             }
+        }
+
+        public async Task<bool> EventExists(Guid id)
+        {
+            var result = await _context.Events.FindAsync(id);
+            return result != null;
         }
     }
 }

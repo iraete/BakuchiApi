@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using BakuchiApi.Contracts;
 using BakuchiApi.Controllers;
 using BakuchiApi.Controllers.Dtos;
 using BakuchiApi.Models;

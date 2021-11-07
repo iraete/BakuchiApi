@@ -1,4 +1,5 @@
 using System;
+using BakuchiApi.Contracts;
 using BakuchiApi.Models;
 using BakuchiApi.Models.Enums;
 

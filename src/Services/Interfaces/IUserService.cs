@@ -26,7 +26,7 @@ namespace BakuchiApi.Services.Interfaces
         ///     Retrieves a specific user by their ID.
         /// </summary>
         /// <param name="id">The user's ID</param>
-        /// <returns>A user DTO</returns>
+        /// <returns>A user DTO, or null.</returns>
         Task<UserDto> RetrieveUser(long id);
         
         /// <summary>
@@ -49,7 +49,7 @@ namespace BakuchiApi.Services.Interfaces
         /// </summary>
         /// <param name="userDto">A DTO with required user information</param>
         /// <returns></returns>
-        Task CreateUser(CreateUserDto userDto);
+        Task<long> CreateUser(CreateUserDto userDto);
         
         /// <summary>
         ///     Deletes a specific user.

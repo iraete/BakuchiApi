@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using BakuchiApi.Contracts;
+using BakuchiApi.Contracts.Requests;
 using BakuchiApi.Controllers.Dtos;
 using BakuchiApi.Services.Interfaces;
 using BakuchiApi.StatusExceptions;
@@ -12,95 +14,55 @@ namespace BakuchiApi.Controllers
     [ApiController]
     public class EventController : ControllerBase
     {
-        private readonly EventDtoMapper _eventMapper;
         private readonly IEventService _eventService;
-        private readonly UserDtoMapper _userMapper;
         private readonly IUserService _userService;
 
         public EventController(IEventService eventService, IUserService userService)
         {
             _eventService = eventService;
             _userService = userService;
-            _eventMapper = new EventDtoMapper();
-            _userMapper = new UserDtoMapper();
         }
 
-        // GET: api/Event
         [HttpGet]
         public async Task<ActionResult<IEnumerable<EventDto>>> RetrieveEvents()
-        {
-            var events = await _eventService.RetrieveEvents();
-            return _eventMapper.MapEntitiesToDtos(events);
+        { 
+            return await _eventService.RetrieveEvents();
         }
 
-        // GET: api/Event/?alias=bakuchi&userid=2000&serverid=1000
         [HttpGet("{id}")]
         public async Task<ActionResult<EventDto>> RetrieveEvent(Guid eventId)
         {
             var @event = await _eventService.RetrieveEvent(eventId);
-
             if (@event == null)
             {
                 return NotFound();
             }
 
-            return _eventMapper.MapEntityToDto(@event);
+            return @event;
         }
 
-        // PUT: api/Event
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateEvent(
-            Guid id, UpdateEventDto eventDto)
+        public async Task<IActionResult> UpdateEvent(Guid id, UpdateEventDto eventDto)
         {
-            if (id != eventDto.Id
-                || !ValidateDates(eventDto.Start, eventDto.End))
-            {
+            if (id != eventDto.Id || !ValidateDates(eventDto.Start, eventDto.End))
                 throw new BadRequestException();
-            }
 
-            var @event = _eventMapper.MapUpdateDtoToEntity(eventDto);
-
-            var entity = await _eventService.RetrieveEvent(id);
-
-            if (entity == null)
-            {
-                throw new NotFoundException();
-            }
-
-            entity.Description = @event.Description;
-            entity.Start = @event.Start;
-            entity.End = @event.End;
-            await _eventService.UpdateEvent(entity);
+            await _eventService.UpdateEvent(eventDto);
 
             return NoContent();
         }
 
-        // POST: api/Event
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<EventDto>>
-            CreateEvent(CreateEventDto eventDto)
+        public async Task<ActionResult<EventDto>> CreateEvent(CreateEventDto eventDto)
         {
             if (!ValidateDates(eventDto.Start, eventDto.End))
-            {
                 throw new BadRequestException();
-            }
 
-            if (!_userService.UserExists(eventDto.UserId) ||
-                !_userService.DiscordIdExists(eventDto.DiscordId))
-            {
-                await CreateUser(eventDto);
-            }
+            var resultId = await _eventService.CreateEvent(eventDto);
 
-            var @event = _eventMapper.MapCreateDtoToEntity(eventDto);
-            await _eventService.CreateEvent(@event);
-
-            return CreatedAtAction("RetrieveEvent", new {id = @event.Id},
-                _eventMapper.MapEntityToDto(@event));
+            return CreatedAtAction("RetrieveEvent", new {id = resultId});
         }
 
-        // DELETE: api/Event/?alias=bakuchi&userid=2000&serverid=1000
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteEvent(Guid eventId)
         {
@@ -111,26 +73,13 @@ namespace BakuchiApi.Controllers
                 throw new NotFoundException();
             }
 
-            await _eventService.DeleteEvent(@event);
+            await _eventService.DeleteEvent(@eventId);
             return NoContent();
         }
 
         private bool ValidateDates(DateTime start, DateTime end)
         {
             return start < end;
-        }
-
-        private async Task CreateUser(CreateEventDto eventDto)
-        {
-            var user = _userMapper.MapCreateDtoToEntity(
-                new CreateUserDto
-                {
-                    Name = eventDto.UserName,
-                    DiscordId = eventDto.DiscordId
-                }
-            );
-            await _userService.CreateUser(user);
-            eventDto.UserId = user.Id;
         }
     }
 }

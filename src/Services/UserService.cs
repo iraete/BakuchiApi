@@ -33,53 +33,42 @@ namespace BakuchiApi.Services
             return _mapper.Map<User[], List<UserDto>>(results);
         }
 
-        public async Task<UserDto> RetrieveUser(long discordId)
+        public async Task<UserDto> RetrieveUser(long id)
         {
-            return _mapper.Map<UserDto>(await _context.Users.FindAsync(discordId));
+            return _mapper.Map<UserDto>(await _context.Users.FindAsync(id));
         }
 
         public async Task UpdateUser(UpdateUserDto userDto)
         {
-            var user = _mapper.Map<User>(userDto);
-            await _validator.ValidateAndThrowAsync(user);
-            _context.Entry(user).State = EntityState.Modified;
+            var entity = await _context.Users.FindAsync(userDto.Id);
 
-            try
+            if (entity == null)
             {
-                await _context.SaveChangesAsync();
+                throw new NotFoundException();
             }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!await UserExists(userDto.Id))
-                {
-                    throw new NotFoundException();
-                }
 
-                throw;
-            }
+            _mapper.Map(userDto, entity);
+            await _validator.ValidateAndThrowAsync(entity);
+            _context.Entry(entity).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
         }
 
         public async Task UpdateUserInfo(UpdateUserInfoDto userDto)
         {
-            var user = _mapper.Map<User>(userDto);
-            await _validator.ValidateAndThrowAsync(user);
-            _context.Entry(user).State = EntityState.Modified;
+            var entity = await _context.Users.FindAsync(userDto.Id);
 
-            try
+            if (entity == null)
             {
-                await _context.SaveChangesAsync();
+                throw new NotFoundException();
             }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!await UserExists(userDto.Id))
-                {
-                    throw new NotFoundException();
-                }
-                throw;
-            }
+
+            _mapper.Map(userDto, entity);
+            await _validator.ValidateAndThrowAsync(entity);
+            _context.Entry(entity).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
         }
 
-        public async Task CreateUser(CreateUserDto userDto)
+        public async Task<long> CreateUser(CreateUserDto userDto)
         {
             var user = _mapper.Map<User>(userDto);
             await _validator.ValidateAndThrowAsync(user);
@@ -87,6 +76,7 @@ namespace BakuchiApi.Services
             {
                 _context.Users.Add(user);
                 await _context.SaveChangesAsync();
+                return user.Id;
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -95,13 +85,14 @@ namespace BakuchiApi.Services
                     throw new ConflictException("A user with the provided "
                                                 + "Discord ID already exists.");
                 }
+
                 throw;
             }
         }
 
-        public async Task DeleteUser(long discordId)
+        public async Task DeleteUser(long id)
         {
-            var user = await _context.Users.FindAsync(discordId);
+            var user = await _context.Users.FindAsync(id);
             if (user != null)
             {
                 _context.Users.Remove(user);
@@ -109,9 +100,9 @@ namespace BakuchiApi.Services
             }
         }
 
-        public async Task<bool> UserExists(long discordId)
+        public async Task<bool> UserExists(long id)
         {
-            var result = await _context.Users.FindAsync(discordId);
+            var result = await _context.Users.FindAsync(id);
             return result != null;
         }
     }

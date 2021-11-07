@@ -1,6 +1,7 @@
+using BakuchiApi.Contracts.Requests;
 using FluentValidation;
 
-namespace BakuchiApi.Controllers.Dtos.Validators
+namespace BakuchiApi.Contracts.Validators
 {
     public class CreateEventDtoValidator : AbstractValidator<CreateEventDto>
     {
@@ -9,7 +10,6 @@ namespace BakuchiApi.Controllers.Dtos.Validators
             RuleFor(e => e.Name).NotNull();
             RuleFor(e => e.UserName).NotNull();
             RuleFor(e => e.Alias).NotNull().MaximumLength(50);
-            RuleFor(e => e.UserId).NotNull();
             RuleFor(e => e.Description).MaximumLength(200);
             RuleFor(e => e.Start)
                 .NotNull()
