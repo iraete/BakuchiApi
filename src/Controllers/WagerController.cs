@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
-using BakuchiApi.Controllers.Dtos;
+using BakuchiApi.Contracts;
+using BakuchiApi.Contracts.Requests;
 using BakuchiApi.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using status = BakuchiApi.StatusExceptions;
@@ -12,17 +13,14 @@ namespace BakuchiApi.Controllers
     public class WagerController : ControllerBase
     {
         private readonly IWagerService _service;
-        private readonly WagerDtoMapper _wagerMapper;
 
         public WagerController(IWagerService service)
         {
             _service = service;
-            _wagerMapper = new WagerDtoMapper();
         }
 
-        // GET: api/Wager/5
         [HttpGet]
-        public async Task<ActionResult<WagerDto>> RetrieveWager(Guid userId, Guid poolId)
+        public async Task<ActionResult<WagerDto>> RetrieveWager(long userId, Guid poolId)
         {
             var wager = await _service.RetrieveWager(userId, poolId);
 
@@ -31,80 +29,39 @@ namespace BakuchiApi.Controllers
                 return NotFound();
             }
 
-            return _wagerMapper.MapEntityToDto(wager);
+            return wager;
         }
 
-        // PUT: api/Wager/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut]
-        public async Task<IActionResult> UpdateWager(Guid userId, Guid poolId,
+        public async Task<IActionResult> UpdateWager(long userId, Guid poolId,
             [FromBody] UpdateWagerDto wagerDto)
         {
-            if (userId != wagerDto.UserId)
+            if (userId != wagerDto.UserId || poolId != wagerDto.PoolId)
             {
                 return BadRequest();
             }
 
-            var wager = _wagerMapper.MapUpdateDtoToEntity(wagerDto);
-
-            try
-            {
-                await _service.UpdateWager(wager);
-            }
-            catch (status.NotFoundException)
-            {
-                return NotFound();
-            }
-            catch
-            {
-                throw new Exception("Error updating wager");
-            }
+            await _service.UpdateWager(wagerDto);
 
             return NoContent();
         }
 
-        // POST: api/Wager
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<WagerDto>> CreateWager(
             CreateWagerDto wagerDto)
         {
-            var wager = _wagerMapper.MapCreateDtoToEntity(wagerDto);
-
-            try
-            {
-                await _service.CreateWager(wager);
-            }
-            catch (status.ConflictException)
-            {
-                return Conflict();
-            }
-            catch
-            {
-                throw new Exception("Error adding wager");
-            }
-
+            await _service.CreateWager(wagerDto);
             return CreatedAtAction("RetrieveWager", new
-                {
-                    userId = wager.UserId,
-                    poolId = wager.PoolId
-                },
-                _wagerMapper.MapEntityToDto(wager));
+            {
+                userId = wagerDto.UserId,
+                poolId = wagerDto.PoolId
+            });
         }
 
-        // DELETE: api/Wager/5
         [HttpDelete]
-        public async Task<IActionResult> DeleteWager(Guid userId, Guid poolId)
+        public async Task<IActionResult> DeleteWager(long userId, Guid poolId)
         {
-            var wager = await _service.RetrieveWager(userId, poolId);
-
-            if (wager == null)
-            {
-                return NotFound();
-            }
-
-            await _service.DeleteWager(wager);
-
+            await _service.DeleteWager(userId, poolId);
             return NoContent();
         }
     }

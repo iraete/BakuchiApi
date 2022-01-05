@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
-using BakuchiApi.Controllers.Dtos;
+using BakuchiApi.Contracts;
+using BakuchiApi.Contracts.Requests;
 using BakuchiApi.Models;
 using BakuchiApi.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -14,7 +16,6 @@ namespace BakuchiApi.Controllers
     {
         private readonly IEventService _eventService;
         private readonly IResultService _resultService;
-        private readonly ResultDtoMapper _resultMapper;
 
         public ResultController(
             IResultService resultService,
@@ -22,7 +23,6 @@ namespace BakuchiApi.Controllers
         {
             _resultService = resultService;
             _eventService = eventService;
-            _resultMapper = new ResultDtoMapper();
         }
 
         // GET: api/Result
@@ -30,8 +30,7 @@ namespace BakuchiApi.Controllers
         public async Task<ActionResult<IEnumerable<ResultDto>>>
             RetrieveResultsByEvent(Guid eventId)
         {
-            var results = await _resultService.RetrieveResultsByEvent(eventId);
-            return _resultMapper.MapEntitiesToDtos(results);
+            return await _resultService.RetrieveResultsByEvent(eventId);
         }
 
         // PUT: api/Result/5
@@ -47,9 +46,7 @@ namespace BakuchiApi.Controllers
                 }
 
             await ProcessDtos(resultDtos,
-                _resultMapper.MapUpdateDtoToEntity,
                 _resultService.UpdateResult);
-
             return NoContent();
         }
 
@@ -65,19 +62,17 @@ namespace BakuchiApi.Controllers
                     return BadRequest();
                 }
 
-            await ProcessDtos(resultDtos,
-                _resultMapper.MapCreateDtoToEntity,
+            var results = await ProcessDtos(resultDtos,
                 _resultService.CreateResult);
 
-            return CreatedAtAction("RetrieveResultsByEvent",
-                new {eventId}, eventId);
+            return CreatedAtAction("RetrieveResultsByEvent", results);
         }
 
         // DELETE: api/Result/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteResults(Guid eventId)
         {
-            var eventExists = _eventService.EventExists(eventId);
+            var eventExists = await _eventService.EventExists(eventId);
 
             if (!eventExists)
             {
@@ -87,23 +82,22 @@ namespace BakuchiApi.Controllers
             var results = await _resultService.RetrieveResultsByEvent(eventId);
             var tasks = new List<Task>();
 
-            foreach (var r in results) tasks.Add(_resultService.DeleteResult(r));
+            foreach (var r in results) 
+                tasks.Add(_resultService.DeleteResult(eventId, r.Alias));
 
             await Task.WhenAll(tasks);
             return NoContent();
         }
 
-        private async Task ProcessDtos<TSource>(
+        private async Task<List<ResultDto>> ProcessDtos<TSource>(
             IEnumerable<TSource> resultDtos,
-            Func<TSource, Result> convert,
-            Func<Result, Task> process)
+            Func<TSource, Task<ResultDto>> process)
         {
-            var results = new List<Result>();
-            var tasks = new List<Task>();
-            foreach (var dto in resultDtos) results.Add(convert(dto));
-            foreach (var r in results) tasks.Add(process(r));
+            var tasks = new List<Task<ResultDto>>();
+            foreach (var r in resultDtos) tasks.Add(process(r));
 
-            await Task.WhenAll(tasks);
+            var results = await Task.WhenAll(tasks);
+            return results.ToList();
         }
     }
 }

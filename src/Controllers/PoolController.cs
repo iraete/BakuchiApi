@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using BakuchiApi.Controllers.Dtos;
-using BakuchiApi.Models;
+using BakuchiApi.Contracts;
+using BakuchiApi.Contracts.Requests;
 using BakuchiApi.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using status = BakuchiApi.StatusExceptions;
@@ -14,23 +14,18 @@ namespace BakuchiApi.Controllers
     public class PoolController : ControllerBase
     {
         private readonly IPoolService _service;
-        private readonly PoolDtoMapper _poolMapper;
 
         public PoolController(IPoolService service)
         {
             _service = service;
-            _poolMapper = new PoolDtoMapper();
         }
 
-        // GET: api/Pool
         [HttpGet]
         public async Task<ActionResult<IEnumerable<PoolDto>>> RetrievePools()
         {
-            var pools = await _service.RetrievePools();
-            return _poolMapper.MapEntitiesToDtos(pools);
+            return await _service.RetrievePools();
         }
 
-        // GET: api/Pool/5
         [HttpGet("{id}")]
         public async Task<ActionResult<PoolDto>> RetrievePool(Guid id)
         {
@@ -41,21 +36,11 @@ namespace BakuchiApi.Controllers
                 return NotFound();
             }
 
-            return _poolMapper.MapEntityToDto(pool);
+            return pool;
         }
 
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<PoolDto>>>
-            RetrievePoolsByEvent(Guid eventId)
-        {
-            var pools = await _service.RetrievePoolsByEvent(eventId);
-            return _poolMapper.MapEntitiesToDtos(pools);
-        }
-
-        // PUT: api/Pool/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdatePool(Guid id,
+        public async Task<ActionResult<PoolDto>> UpdatePool(Guid id,
             UpdatePoolDto poolDto)
         {
             if (id != poolDto.Id)
@@ -63,51 +48,20 @@ namespace BakuchiApi.Controllers
                 return BadRequest();
             }
 
-            var pool = _poolMapper.MapUpdateDtoToEntity(poolDto);
-
-            try
-            {
-                var entity = await _service.RetrievePool(id);
-                entity.Alias = pool.Alias;
-                entity.BetType = pool.BetType;
-                entity.Description = pool.Description;
-                await _service.UpdatePool(entity);
-            }
-            catch (status.NotFoundException)
-            {
-                return NotFound();
-            }
-            catch
-            {
-                throw new Exception("Error adding event pool");
-            }
-
-            return NoContent();
+            return await _service.UpdatePool(poolDto);
         }
 
-        // POST: api/Pool
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Pool>> CreatePool(CreatePoolDto poolDto)
+        public async Task<ActionResult<PoolDto>> CreatePool(CreatePoolDto poolDto)
         {
-            var pool = _poolMapper.MapCreateDtoToEntity(poolDto);
-            await _service.CreatePool(pool);
-            return CreatedAtAction("RetrievePool", new {id = pool.Id},
-                _poolMapper.MapEntityToDto(pool));
+            var pool = await _service.CreatePool(poolDto);
+            return CreatedAtAction("RetrievePool", new {id = pool.Id}, pool);
         }
 
-        // DELETE: api/Pool/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePool(Guid id)
         {
-            var pool = await _service.RetrievePool(id);
-
-            if (pool == null)
-            {
-                return NotFound();
-            }
-
-            await _service.DeletePool(pool);
+            await _service.DeletePool(id);
             return NoContent();
         }
     }

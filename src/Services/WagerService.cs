@@ -2,10 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
+using BakuchiApi.Contracts;
+using BakuchiApi.Contracts.Requests;
 using BakuchiApi.Models;
 using BakuchiApi.Models.Validators;
 using BakuchiApi.Services.Interfaces;
 using BakuchiApi.StatusExceptions;
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 
 namespace BakuchiApi.Services
@@ -13,83 +17,84 @@ namespace BakuchiApi.Services
     public class WagerService : IWagerService
     {
         private readonly BakuchiContext _context;
-        private readonly WagerValidator _validator;
+        private readonly IValidator<Wager>_validator;
+        private readonly IMapper _mapper;
 
-        public WagerService(BakuchiContext context)
+        public WagerService(
+            BakuchiContext context,
+            IValidator<Wager> validator,
+            IMapper mapper)
         {
-            _validator = new WagerValidator();
+            _validator = validator;
+            _mapper = mapper;
             _context = context;
         }
 
-        public bool WagerExists(Guid userId, Guid eventPoolId)
+        public async Task<bool> WagerExists(long userId, Guid eventPoolId)
         {
-            return _context.Wagers.Any(uw => uw.UserId == userId
-                                             && uw.PoolId == eventPoolId);
+            var result = await _context.Wagers.FindAsync(new {userId, eventPoolId});
+            return result != null;
         }
 
-        public async Task<List<Wager>> RetrieveWagers(Guid userId)
+        public async Task<List<WagerDto>> RetrieveWagers(long userId)
         {
-            return await _context.Wagers.Where(
-                uw => uw.UserId == userId).ToListAsync();
+            var results = await _context.Wagers.Where(
+                uw => uw.UserId == userId).ToArrayAsync();
+            return _mapper.Map<Wager[], List<WagerDto>>(results);
         }
 
-        public async Task<Wager> RetrieveWager(Guid userId, Guid eventPoolId)
+        public async Task<WagerDto> RetrieveWager(long userId, Guid eventPoolId)
         {
-            return await _context.Wagers.FindAsync(userId, eventPoolId);
+            return _mapper.Map<WagerDto>(await _context.Wagers.FindAsync(new {
+                userId, eventPoolId
+            }));
         }
 
-        public async Task UpdateWager(Wager userWager)
+        public async Task<WagerDto> UpdateWager(UpdateWagerDto wagerDto)
         {
-            Validate(userWager);
-            _context.Entry(userWager).State = EntityState.Modified;
+            var entity = await _context.Wagers.FindAsync(new {
+                wagerDto.UserId, wagerDto.PoolId});
 
+            if (entity == null)
+            {
+                throw new NotFoundException();
+            }
+
+            _mapper.Map(wagerDto, entity);
+            await _validator.ValidateAndThrowAsync(entity);
+            _context.Entry(entity).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+            return _mapper.Map<WagerDto>(entity);
+        }
+
+        public async Task<WagerDto> CreateWager(CreateWagerDto wagerDto)
+        {
+            var wager = _mapper.Map<Wager>(wagerDto);
+            await _validator.ValidateAndThrowAsync(wager);
             try
             {
+                _context.Wagers.Add(wager);
                 await _context.SaveChangesAsync();
+                return _mapper.Map<WagerDto>(wager);
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!WagerExists(userWager.UserId, userWager.PoolId))
+                if (await WagerExists(wagerDto.UserId, wagerDto.PoolId))
                 {
-                    throw new NotFoundException();
+                    throw new ConflictException("A wager with the provided "
+                                                + "User ID and Pool ID already exists.");
                 }
-
                 throw;
             }
         }
 
-        public async Task CreateWager(Wager userWager)
+        public async Task DeleteWager(long userId, Guid poolId)
         {
-            Validate(userWager);
-            _context.Wagers.Add(userWager);
-
-            try
+            var wager = await _context.Wagers.FindAsync(new {userId, poolId});
+            if (wager != null)
             {
+                _context.Wagers.Remove(wager);
                 await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateException)
-            {
-                if (WagerExists(userWager.UserId, userWager.PoolId))
-                {
-                    throw new ConflictException();
-                }
-
-                throw;
-            }
-        }
-
-        public async Task DeleteWager(Wager userWager)
-        {
-            _context.Wagers.Remove(userWager);
-            await _context.SaveChangesAsync();
-        }
-
-        private void Validate(Wager wagerObj)
-        {
-            var validationResult = _validator.Validate(wagerObj);
-            if (!validationResult.IsValid)
-            {
-                throw new BadRequestException(validationResult.Errors.ToString());
             }
         }
     }

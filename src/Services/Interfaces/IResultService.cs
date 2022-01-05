@@ -1,16 +1,18 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using BakuchiApi.Contracts;
+using BakuchiApi.Contracts.Requests;
 using BakuchiApi.Models;
 
 namespace BakuchiApi.Services.Interfaces
 {
     public interface IResultService
     {
-        bool ResultExists(Guid eventId, uint outcomeId);
-        Task<List<Result>> RetrieveResultsByEvent(Guid eventId);
-        Task UpdateResult(Result result);
-        Task CreateResult(Result result);
-        Task DeleteResult(Result result);
+        Task<bool> ResultExists(Guid eventId, string alias);
+        Task<List<ResultDto>> RetrieveResultsByEvent(Guid eventId);
+        Task<ResultDto> UpdateResult(UpdateResultDto result);
+        Task<ResultDto> CreateResult(CreateResultDto result);
+        Task DeleteResult(Guid eventId, string alias);
     }
 }

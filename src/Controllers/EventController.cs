@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using BakuchiApi.Contracts;
 using BakuchiApi.Contracts.Requests;
-using BakuchiApi.Controllers.Dtos;
 using BakuchiApi.Services.Interfaces;
 using BakuchiApi.StatusExceptions;
 using Microsoft.AspNetCore.Mvc;
@@ -25,7 +24,7 @@ namespace BakuchiApi.Controllers
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<EventDto>>> RetrieveEvents()
-        { 
+        {
             return await _eventService.RetrieveEvents();
         }
 
@@ -42,25 +41,27 @@ namespace BakuchiApi.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateEvent(Guid id, UpdateEventDto eventDto)
+        public async Task<ActionResult<EventDto>> UpdateEvent(Guid id, UpdateEventDto eventDto)
         {
             if (id != eventDto.Id || !ValidateDates(eventDto.Start, eventDto.End))
+            {
                 throw new BadRequestException();
+            }
 
-            await _eventService.UpdateEvent(eventDto);
-
-            return NoContent();
+            return await _eventService.UpdateEvent(eventDto);
         }
 
         [HttpPost]
         public async Task<ActionResult<EventDto>> CreateEvent(CreateEventDto eventDto)
         {
             if (!ValidateDates(eventDto.Start, eventDto.End))
+            {
                 throw new BadRequestException();
+            }
 
-            var resultId = await _eventService.CreateEvent(eventDto);
+            var result = await _eventService.CreateEvent(eventDto);
 
-            return CreatedAtAction("RetrieveEvent", new {id = resultId});
+            return CreatedAtAction("RetrieveEvent", new {id = result.Id}, result);
         }
 
         [HttpDelete("{id}")]
@@ -73,7 +74,7 @@ namespace BakuchiApi.Controllers
                 throw new NotFoundException();
             }
 
-            await _eventService.DeleteEvent(@eventId);
+            await _eventService.DeleteEvent(eventId);
             return NoContent();
         }
 

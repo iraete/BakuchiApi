@@ -33,15 +33,15 @@ namespace BakuchiApi.Services.Interfaces
         ///     Updates a specific event.
         /// </summary>
         /// <param name="eventDto">An event DTO with the updated fields</param>
-        /// <returns></returns>
-        Task UpdateEvent(UpdateEventDto eventDto);
+        /// <returns>A DTO with updated information on the event</returns>
+        Task<EventDto> UpdateEvent(UpdateEventDto eventDto);
         
         /// <summary>
-        ///     Updates a specific event.
+        ///     Creates a new event.
         /// </summary>
         /// <param name="eventDto">An event DTO</param>
-        /// <returns></returns>
-        Task<Guid> CreateEvent(CreateEventDto eventDto);
+        /// <returns>A DTO with information on the event.</returns>
+        Task<EventDto> CreateEvent(CreateEventDto eventDto);
         
         /// <summary>
         ///     Deletes an event.

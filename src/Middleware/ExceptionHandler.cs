@@ -42,7 +42,7 @@ namespace BakuchiApi.Middleware
                 Title = response.StatusCode.ToString(),
                 Status = response.StatusCode,
                 Instance = httpContext.Request.Path,
-                Detail = ex.Message
+                Detail = ex?.Message
             });
         }
     }

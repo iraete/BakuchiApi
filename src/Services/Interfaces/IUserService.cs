@@ -35,21 +35,21 @@ namespace BakuchiApi.Services.Interfaces
         /// </summary>
         /// <param name="userDto">A <c>UpdateUserDto</c> with user fields</param>
         /// <returns></returns>
-        Task UpdateUser(UpdateUserDto userDto);
+        Task<UserDto> UpdateUser(UpdateUserDto userDto);
         
         /// <summary>
         ///     Updates a specific user's information.
         /// </summary>
         /// <param name="userDto">A DTO containing user information</param>
         /// <returns></returns>
-        Task UpdateUserInfo(UpdateUserInfoDto userDto);
+        Task<UserDto> UpdateUserInfo(UpdateUserInfoDto userDto);
         
         /// <summary>
         ///     Creates a new user.
         /// </summary>
         /// <param name="userDto">A DTO with required user information</param>
         /// <returns></returns>
-        Task<long> CreateUser(CreateUserDto userDto);
+        Task<UserDto> CreateUser(CreateUserDto userDto);
         
         /// <summary>
         ///     Deletes a specific user.

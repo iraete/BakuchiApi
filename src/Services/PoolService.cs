@@ -2,10 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
+using BakuchiApi.Contracts;
+using BakuchiApi.Contracts.Requests;
 using BakuchiApi.Models;
 using BakuchiApi.Models.Validators;
 using BakuchiApi.Services.Interfaces;
 using BakuchiApi.StatusExceptions;
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 
 namespace BakuchiApi.Services
@@ -13,76 +17,89 @@ namespace BakuchiApi.Services
     public class PoolService : IPoolService
     {
         private readonly BakuchiContext _context;
-        private readonly PoolValidator _validator;
+        private readonly IValidator<Pool> _validator;
+        private readonly IMapper _mapper;
 
-        public PoolService(BakuchiContext context)
+        public PoolService(BakuchiContext context, IValidator<Pool> validator, IMapper mapper)
         {
-            _validator = new PoolValidator();
+            _validator = validator;
+            _mapper = mapper;
             _context = context;
         }
 
-        public async Task<List<Pool>> RetrievePools()
+        public async Task<List<PoolDto>> RetrievePools()
         {
-            return await _context.Pools.ToListAsync();
+            var results = await _context.Pools.ToArrayAsync();
+            return _mapper.Map<Pool[], List<PoolDto>>(results);
         }
 
-        public async Task<Pool> RetrievePool(Guid id)
+        public async Task<PoolDto> RetrievePool(Guid id)
         {
-            return await _context.Pools.FindAsync(id);
+            return _mapper.Map<PoolDto>(await _context.Pools.FindAsync(id));
         }
 
-        public async Task<List<Pool>> RetrievePoolsByEvent(Guid eventId)
+        public async Task<PoolDto> UpdatePool(UpdatePoolDto poolDto)
         {
-            return await _context.Pools.Where(
-                p => p.EventId == eventId).ToListAsync();
-        }
+            var entity = await _context.Pools.FindAsync(poolDto.Id);
 
-        public async Task UpdatePool(Pool pool)
-        {
-            Validate(pool);
-            _context.Entry(pool).State = EntityState.Modified;
-
+            if (entity == null)
+                throw new NotFoundException();
+            
+            _mapper.Map(poolDto, entity);
+            await _validator.ValidateAndThrowAsync(entity);
             try
             {
+                _context.Entry(entity).State = EntityState.Modified;
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!PoolExists(pool.Id))
+                if (await PoolExists(poolDto.Alias, poolDto.EventId))
                 {
-                    throw new NotFoundException();
+                    throw new ConflictException("A pool with the given alias " +
+                                                "associated with the event already exists");
+                }
+            }
+            return _mapper.Map<PoolDto>(entity);
+        }
+
+        public async Task<PoolDto> CreatePool(CreatePoolDto poolDto)
+        {
+            var entity = _mapper.Map<Pool>(poolDto);
+            await _validator.ValidateAndThrowAsync(entity);
+            try
+            {
+                _context.Pools.Add(entity);
+                await _context.SaveChangesAsync();
+                return _mapper.Map<PoolDto>(entity);
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (await PoolExists(poolDto.Alias, poolDto.EventId))
+                {
+                    throw new ConflictException("A pool with the given alias " +
+                                                "associated with the event already exists");
                 }
 
                 throw;
             }
         }
 
-        public async Task CreatePool(Pool pool)
+        public async Task DeletePool(Guid poolId)
         {
-            pool.Id = Guid.NewGuid();
-            Validate(pool);
-            _context.Pools.Add(pool);
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task DeletePool(Pool pool)
-        {
-            _context.Pools.Remove(pool);
-            await _context.SaveChangesAsync();
-        }
-
-        public bool PoolExists(Guid id)
-        {
-            return _context.Pools.Any(e => e.Id == id);
-        }
-
-        private void Validate(Pool poolObj)
-        {
-            var validationResult = _validator.Validate(poolObj);
-            if (!validationResult.IsValid)
+            var pool = await _context.Users.FindAsync(poolId);
+            if (pool != null)
             {
-                throw new BadRequestException(validationResult.Errors.ToString());
+                _context.Users.Remove(pool);
+                await _context.SaveChangesAsync();
             }
+        }
+
+        public async Task<bool> PoolExists(string alias, Guid eventId)
+        {
+            var result = await _context.Pools
+                .FirstOrDefaultAsync(p => p.Alias == alias && p.EventId == eventId);
+            return result != null;
         }
     }
 }

@@ -9,7 +9,7 @@ namespace BakuchiApi.Models.Configuration
         {
             builder.Property(r => r.LastEdited)
                 .HasDefaultValueSql("localtimestamp");
-            builder.HasKey(r => new {r.EventId, r.OutcomeId});
+            builder.HasKey(r => new {r.EventId, r.Alias});
             builder.HasIndex(r => new {r.EventId, r.Rank}).IsUnique();
         }
     }

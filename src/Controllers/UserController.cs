@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using BakuchiApi.Contracts;
 using BakuchiApi.Contracts.Requests;
-using BakuchiApi.Models;
 using BakuchiApi.Services.Interfaces;
 using BakuchiApi.StatusExceptions;
 using Microsoft.AspNetCore.Mvc;
@@ -32,29 +31,28 @@ namespace BakuchiApi.Controllers
             var user = await _service.RetrieveUser(id);
             if (user == null)
             {
-                throw new BadRequestException();
+                return NotFound();
             }
 
             return user;
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateUserInfo(long id, UpdateUserInfoDto userDto)
+        public async Task<ActionResult<UserDto>> UpdateUserInfo(long id, UpdateUserInfoDto userDto)
         {
             if (id != userDto.Id)
             {
                 throw new BadRequestException();
             }
 
-            await _service.UpdateUserInfo(userDto);
-            return NoContent();
+            return await _service.UpdateUserInfo(userDto);
         }
 
         [HttpPost]
-        public async Task<ActionResult<User>> CreateUser(CreateUserDto userDto)
+        public async Task<ActionResult<UserDto>> CreateUser(CreateUserDto userDto)
         {
-            await _service.CreateUser(userDto);
-            return CreatedAtAction("CreateUser", new {id = userDto.Id});
+            var result = await _service.CreateUser(userDto);
+            return CreatedAtAction("CreateUser", new {id = userDto.Id}, result);
         }
 
         [HttpDelete("{id}")]

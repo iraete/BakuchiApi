@@ -1,13 +1,14 @@
+using BakuchiApi.Contracts.Requests;
 using FluentValidation;
 
-namespace BakuchiApi.Controllers.Dtos.Validators
+namespace BakuchiApi.Contracts.Validators
 {
     public class CreateResultDtoValidator : AbstractValidator<CreateResultDto>
     {
         public CreateResultDtoValidator()
         {
             RuleFor(r => r.EventId).NotNull();
-            RuleFor(r => r.OutcomeId).NotNull();
+            RuleFor(r => r.Alias).NotNull();
             RuleFor(r => r.Rank).NotNull();
         }
     }
@@ -17,7 +18,7 @@ namespace BakuchiApi.Controllers.Dtos.Validators
         public UpdateResultDtoValidator()
         {
             RuleFor(r => r.EventId).NotNull();
-            RuleFor(r => r.OutcomeId).NotNull();
+            RuleFor(r => r.Alias).NotNull();
             RuleFor(r => r.Rank).NotNull();
         }
     }

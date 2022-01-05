@@ -1,16 +1,12 @@
 using System;
 
-namespace BakuchiApi.Models
+namespace BakuchiApi.Contracts
 {
-    public class Result
+    public class ResultDto
     {
         public Guid EventId { get; set; }
         public string Alias { get; set; }
         public uint Rank { get; set; }
         public DateTime LastEdited { get; set; }
-
-        // Navigation Properties
-        public Event Event { get; set; }
-        public Outcome Outcome { get; set; }
     }
 }

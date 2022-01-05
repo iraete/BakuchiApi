@@ -44,7 +44,7 @@ namespace BakuchiApi
             services.AddScoped<IResultService, ResultService>();
 
             // Other service-layer services
-            services.AddScoped<IEconomyService, EconomyService>();
+            // services.AddScoped<IEconomyService, EconomyService>();
 
             // Add controllers and validation
             services.AddControllers()

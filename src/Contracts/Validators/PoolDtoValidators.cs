@@ -1,6 +1,7 @@
+using BakuchiApi.Contracts.Requests;
 using FluentValidation;
 
-namespace BakuchiApi.Controllers.Dtos.Validators
+namespace BakuchiApi.Contracts.Validators
 {
     public class CreatePoolDtoValidator : AbstractValidator<CreatePoolDto>
     {

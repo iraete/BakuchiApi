@@ -39,7 +39,7 @@ namespace BakuchiApi.Services
             return _mapper.Map<EventDto>(await _context.Events.FindAsync(id));
         }
 
-        public async Task UpdateEvent(UpdateEventDto eventDto)
+        public async Task<EventDto> UpdateEvent(UpdateEventDto eventDto)
         {
             var entity = await _context.Events.FindAsync(eventDto.Id);
 
@@ -52,16 +52,17 @@ namespace BakuchiApi.Services
             await _validator.ValidateAndThrowAsync(entity);
             _context.Entry(entity).State = EntityState.Modified;
             await _context.SaveChangesAsync();
+            return _mapper.Map<EventDto>(entity);
         }
 
-        public async Task<Guid> CreateEvent(CreateEventDto eventDto)
+        public async Task<EventDto> CreateEvent(CreateEventDto eventDto)
         {
             var entity = _mapper.Map<Event>(eventDto);
             entity.Created = DateTime.Now;
             await _validator.ValidateAndThrowAsync(entity);
             _context.Events.Add(entity);
             await _context.SaveChangesAsync();
-            return entity.Id;
+            return _mapper.Map<EventDto>(entity);
         }
 
         public async Task DeleteEvent(Guid eventId)

@@ -7,7 +7,7 @@ namespace BakuchiApi.Models.Validators
         public ResultValidator()
         {
             RuleFor(result => result.EventId).NotNull();
-            RuleFor(result => result.OutcomeId).NotNull();
+            RuleFor(result => result.Alias).NotNull();
             RuleFor(result => result.Rank).NotNull();
         }
     }
